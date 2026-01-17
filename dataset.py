@@ -1,6 +1,7 @@
 import os
 import torch
 import torchaudio
+import soundfile as sf
 from torch.utils.data import Dataset
 
 class ASVspoofDataset(Dataset):
@@ -17,8 +18,6 @@ class ASVspoofDataset(Dataset):
         self.labels = [] # 0 for Real (Bonafide), 1 for Fake (Spoof)
 
         # 1. Parse the Protocol File
-        # ASVspoof protocol format: SPEAKER_ID AUDIO_FILE_NAME - SYSTEM_ID KEY
-        # Example: LA_0069 LA_D_1047731 - - bonafide
         with open(protocol_file, 'r') as f:
             lines = f.readlines()
             for line in lines:
@@ -38,9 +37,20 @@ class ASVspoofDataset(Dataset):
         file_name = self.file_list[idx]
         file_path = os.path.join(self.base_dir, file_name + ".flac")
         
-        # 2. Load Audio
-        # waveform shape: (Channels, Time) -> (1, Time)
-        waveform, sample_rate = torchaudio.load(file_path, backend="soundfile")
+        # --- NEW LOADING BLOCK START (Fixes Colab Crash) ---
+        # 1. Load using soundfile (It returns a numpy array)
+        waveform_np, sample_rate = sf.read(file_path)
+        
+        # 2. Convert to PyTorch Tensor
+        waveform = torch.from_numpy(waveform_np).float()
+        
+        # 3. Ensure shape is (Channels, Time) -> (1, 64000)
+        # soundfile usually returns (Time, Channels) or just (Time)
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0) # Add channel dimension
+        else:
+            waveform = waveform.t() # Transpose if stereo
+        # --- NEW LOADING BLOCK END ---
 
         # 3. Fix Length (Cut or Pad)
         # We need exactly 64000 samples for the model to work
