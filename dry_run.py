@@ -67,9 +67,9 @@ def test_dataloader():
     
     # Save random tensors as .flac files
     fake_audio = torch.randn(1, 48000) # Short file (3s)
-    torchaudio.save("dummy_data/test_file_01.flac", fake_audio, 16000, backend="soundfile")    
+    sf.write("dummy_data/test_file_01.flac", fake_audio.squeeze().numpy(), 16000)    
     long_audio = torch.randn(1, 80000) # Long file (5s)
-    torchaudio.save("dummy_data/test_file_02.flac", long_audio, 16000, backend="soundfile")
+    sf.write("dummy_data/test_file_02.flac", long_audio.squeeze().numpy(), 16000)
 
     # 2. Initialize Dataset
     print("    Initializing ASVspoofDataset...")
