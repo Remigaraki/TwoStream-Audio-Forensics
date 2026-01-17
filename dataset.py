@@ -40,7 +40,7 @@ class ASVspoofDataset(Dataset):
         
         # 2. Load Audio
         # waveform shape: (Channels, Time) -> (1, Time)
-        waveform, sample_rate = torchaudio.load(file_path)
+        waveform, sample_rate = torchaudio.load(file_path, backend="soundfile")
 
         # 3. Fix Length (Cut or Pad)
         # We need exactly 64000 samples for the model to work
