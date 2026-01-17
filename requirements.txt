@@ -5,3 +5,4 @@ scipy
 librosa
 matplotlib
 scikit-learn
+soundfile
