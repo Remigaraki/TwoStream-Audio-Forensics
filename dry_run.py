@@ -4,6 +4,7 @@ import numpy as np
 import os
 import shutil
 import torchaudio
+import soundfile as sf  # <--- THIS IS MISSING
 
 # --- IMPORTS FROM YOUR OTHER FILES ---
 from models import TwoStreamFusionNet, MockRawNet2
