@@ -4,21 +4,17 @@ import torch.nn as nn
 # --- MOCK COMPONENTS (Placeholders for the Real Deal) ---
 
 class MockRawNet2(nn.Module):
-    """
-    Simulates RawNet2 behavior without needing the 100MB weights file.
-    Output: 1024-dimensional embedding.
-    """
     def __init__(self):
         super(MockRawNet2, self).__init__()
-        # A simple conv layer to simulate processing
         self.conv = nn.Conv1d(1, 128, kernel_size=3)
-        self.fc = nn.Linear(128 * 63998, 1024) # Flatten simulation
+        # FIX: Input is 128 (channels), NOT 128*64000
+        self.fc = nn.Linear(128, 1024) 
 
     def forward(self, x):
-        # x shape: (Batch, 64000) -> needs channel dim for Conv1d
         x = x.unsqueeze(1) 
         x = self.conv(x)
-        x = x.view(x.size(0), -1) # Flatten
+        # FIX: Average Pooling reduces the size drastically
+        x = torch.mean(x, dim=2) 
         x = self.fc(x)
         return x
 
