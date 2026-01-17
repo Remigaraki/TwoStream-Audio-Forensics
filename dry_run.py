@@ -1,54 +1,35 @@
-import torch
-import numpy as np
-from models import TwoStreamFusionNet, MockRawNet2
-from feature_extraction import get_bispectrum_features
+# ... (keep existing code) ...
 
-def main():
-    print("--- STARTING DRY RUN ---")
-
-    # 1. Simulate Data Batch (Batch Size = 4)
-    print("[1] Generating Synthetic Audio...")
-    # 4 random audio files, 4 seconds long (64000 samples)
-    dummy_audio = torch.randn(4, 64000) 
+def test_dataloader():
+    print("\n--- TESTING DATA LOADER ---")
+    # MOCK DATA SETUP (Just to prove the class works)
+    # 1. Create a dummy protocol file
+    with open("dummy_protocol.txt", "w") as f:
+        f.write("SPEAKER1 test_file_01 - - bonafide\n")
+        f.write("SPEAKER1 test_file_02 - - spoof\n")
     
-    # 2. Simulate Feature Extraction (The Member C Pipeline)
-    print("[2] Extracting Bispectrum Features...")
-    stat_features_list = []
-    for i in range(4):
-        # Convert tensor to numpy for math processing
-        audio_np = dummy_audio[i].numpy()
-        # Extract features
-        feat = get_bispectrum_features(audio_np)
-        stat_features_list.append(feat)
+    # 2. Create dummy .flac files
+    os.makedirs("dummy_data", exist_ok=True)
     
-    # Convert back to Torch Tensor
-    dummy_stats = torch.tensor(np.array(stat_features_list))
-    print(f"    Stats Shape: {dummy_stats.shape} (Should be [4, 128])")
-
-    # 3. Initialize Model
-    print("[3] Initializing Fusion Architecture...")
-    rawnet = MockRawNet2()
-    model = TwoStreamFusionNet(rawnet)
+    # Save a random tensor as a real .flac file using torchaudio
+    fake_audio = torch.randn(1, 48000) # Short file (3s)
+    torchaudio.save("dummy_data/test_file_01.flac", fake_audio, 16000)
     
-    # 4. Forward Pass (Inference)
-    print("[4] Running Forward Pass...")
-    model.train() # Set to train mode
-    predictions = model(dummy_audio, dummy_stats)
-    print(f"    Output Logits: \n{predictions.detach().numpy()}")
-    print(f"    Output Shape: {predictions.shape} (Should be [4, 2])")
+    long_audio = torch.randn(1, 80000) # Long file (5s)
+    torchaudio.save("dummy_data/test_file_02.flac", long_audio, 16000)
 
-    # 5. Backward Pass (Training Simulation)
-    print("[5] Testing Backpropagation...")
-    labels = torch.tensor([0, 1, 0, 1]) # 0=Real, 1=Fake
-    criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-    loss = criterion(predictions, labels)
-    loss.backward()
-    optimizer.step()
+    # 3. Initialize Dataset
+    dataset = ASVspoofDataset(base_dir="dummy_data", protocol_file="dummy_protocol.txt")
     
-    print(f"    Loss Value: {loss.item():.4f}")
-    print("--- DRY RUN SUCCESSFUL: Architecture is Valid ---")
-
-if __name__ == "__main__":
-    main()
+    # 4. Check Output
+    print(f"Dataset Size: {len(dataset)} files")
+    sample_wav, sample_label = dataset[0]
+    
+    print(f"Sample 0 Shape: {sample_wav.shape} (Should be [1, 64000])")
+    print(f"Sample 0 Label: {sample_label} (Should be 0)")
+    
+    # Clean up
+    import shutil
+    shutil.rmtree("dummy_data")
+    os.remove("dummy_protocol.txt")
+    print("--- DATA LOADER TEST PASSED ---")
