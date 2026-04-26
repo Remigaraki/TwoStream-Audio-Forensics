@@ -6,3 +6,4 @@ librosa
 matplotlib
 scikit-learn
 soundfile
+streamlit
