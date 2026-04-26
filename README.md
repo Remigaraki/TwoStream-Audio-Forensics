@@ -18,11 +18,12 @@ We train and evaluate on **ASVspoof 5 (2025)** and **WaveFake**.
 ---
 
 ## 🏗️ Infrastructure & CI/CD Paradigm
-We use a **Hybrid Local-Cloud CI/CD Pipeline** to streamline development and training on 30GB+ datasets:
+We use a **Hybrid Local-Cloud CI/CD Pipeline** with strict branching strategies and reproducible environments:
 
-1. **Local Development:** Write modules, perform unit testing, and push to GitHub using VS Code/Antigravity.
-2. **Version Control & CI (GitHub):** GitHub Actions automatically runs `flake8` linting, `mypy` type checking, and lightweight `pytest` unit tests.
-3. **Cloud Execution (Google Colab):** Google Colab serves as our Cloud GPU runner. It pulls the latest code from GitHub, mounts Google Drive containing the datasets, and executes the heavy PyTorch training loops.
+1. **GitFlow Branching Strategy:** Development strictly follows GitFlow. All changes must be pushed to `feature/*` branches, merged into `dev`, and ultimately deployed to `main`. CI validates all branches.
+2. **Local Development:** Write modules, perform unit testing, and push to GitHub using VS Code/Antigravity.
+3. **Version Control & CI (GitHub):** GitHub Actions automatically runs `flake8` linting, `mypy` type checking, and lightweight `pytest` unit tests.
+4. **Cloud Execution (Google Colab):** Google Colab serves as our Cloud GPU runner. It pulls the latest code from GitHub, uses the pinned `environment.yml`, mounts Google Drive containing the datasets, and executes the heavy PyTorch training loops.
 
 ---
 
@@ -35,19 +36,23 @@ hearing_reality/
 ├── data/
 │   ├── dataset_loader.py          # PyTorch DataLoaders for ASVspoof 5 & WaveFake
 │   └── torture_pipeline.py        # "Torture Chamber": MP3/Opus compression augmentation (pydub/ffmpeg)
-├── features/
-│   ├── extract_bispectrum.py      # Statistical Higher-Order Phase Coupling math (Stream 2)
-│   └── audio_utils.py             # 16kHz resampling, 4-second padding/trimming (64,000 samples)
-├── models/
-│   ├── rawnet2.py                 # Neural Baseline (Stream 1)
-│   ├── attention_fusion.py        # Attention mechanism combining Stream 1 and Stream 2
-│   └── two_stream_net.py          # The final combined PyTorch nn.Module
+├── src/
+│   ├── stream1/                   
+│   │   └── rawnet2.py             # Neural Baseline (Stream 1)
+│   ├── stream2/                   
+│   │   └── extract_bispectrum.py  # Statistical Higher-Order Phase Coupling math (Stream 2)
+│   ├── fusion/
+│   │   ├── attention_fusion.py    # Attention mechanism combining Stream 1 and Stream 2
+│   │   └── two_stream_net.py      # The final combined PyTorch nn.Module
+│   └── utils/                     
+│       ├── audio_utils.py         # 16kHz resampling, 4-second padding/trimming (64,000 samples)
+│       ├── metrics.py             # EER and t-DCF calculation logic
+│       └── logger.py              # Training logs, TensorBoard hooks
+├── experiments/                   # Stores experiment configurations and outputs
 ├── notebooks/
 │   └── Colab_Main_Runner.ipynb    # THE CLOUD RUNNER: Mounts GDrive, git pulls repo, runs training
-├── utils/
-│   ├── metrics.py                 # EER and t-DCF calculation logic
-│   └── logger.py                  # Training logs, TensorBoard hooks
-├── requirements.txt               # Strict dependencies (torch, torchaudio, librosa, pydub, scipy)
+├── environment.yml                # Conda environment with pinned PyTorch, CUDA, numpy, torchaudio
+├── requirements.txt               # Strict dependencies (pip fallback)
 └── README.md                      # Instructions on the Local -> Github -> Colab pipeline
 ```
 
@@ -55,12 +60,11 @@ hearing_reality/
 
 ## 🛠️ Usage
 
-### 1. Local Development
-Clone the repo and install dependencies:
+### 1. Conda Environment Setup
+Create the reproducible shared Conda environment with pinned versions:
 ```bash
-git clone https://github.com/Remigaraki/TwoStream-Audio-Forensics.git
-cd TwoStream-Audio-Forensics
-pip install -r requirements.txt
+conda env create -f environment.yml
+conda activate hearing_reality
 ```
 
 ### 2. Run the "Torture" Pipeline
@@ -72,4 +76,4 @@ python data/torture_pipeline.py --input_dir ./data/raw --output_dir ./data/lossy
 ### 3. Training on Colab
 1. Upload your datasets to Google Drive.
 2. Open `notebooks/Colab_Main_Runner.ipynb` in Google Colab.
-3. Run the cells to mount Drive, pull the latest `main` branch, and start training on a Cloud GPU.
+3. Run the cells to mount Drive, pull the latest `main` branch, setup the Conda environment, and start training on a Cloud GPU.

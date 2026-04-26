@@ -2,7 +2,7 @@ import os
 import torch
 import soundfile as sf
 from torch.utils.data import Dataset
-from features.audio_utils import process_waveform
+from src.utils.audio_utils import process_waveform
 
 class ASVspoofDataset(Dataset):
     """

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from models.rawnet2 import RawNet2Encoder
-from models.attention_fusion import AttentionFusion
+from src.stream1.rawnet2 import RawNet2Encoder
+from src.fusion.attention_fusion import AttentionFusion
 
 class StatisticalStream(nn.Module):
     def __init__(self, input_dim=128, hidden_dim=256, output_dim=256):
