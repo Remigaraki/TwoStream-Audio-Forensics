@@ -1,9 +1,12 @@
+# --- Strict Dependencies for Hearing Reality ---
 torch
 torchaudio
-numpy
-scipy
 librosa
-matplotlib
+pydub
+scipy
+numpy
 scikit-learn
-soundfile
-streamlit
+tensorboard
+flake8
+mypy
+pytest
