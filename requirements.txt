@@ -1,12 +1,23 @@
-# --- Strict Dependencies for Hearing Reality ---
+# Hearing Reality / TwoStream-Audio-Forensics
+#
+# Core runtime dependencies used by the training, feature extraction, and data
+# loading code paths in src/ and data/.
 torch
 torchaudio
 librosa
+soundfile
 pydub
 scipy
 numpy
 scikit-learn
 tensorboard
+
+# Development and verification dependencies used by CI and local checks.
 flake8
 mypy
 pytest
+
+# Notes:
+# - pydub requires a system ffmpeg installation for codec conversion.
+# - Colab-only notebook cells import google.colab, but that is not required for
+#   local execution or pip installation.
