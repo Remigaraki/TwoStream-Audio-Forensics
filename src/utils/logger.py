@@ -8,6 +8,7 @@ def setup_logger(name, log_file, level=logging.INFO):
     
     logger = logging.getLogger(name)
     logger.setLevel(level)
+    logger.handlers.clear()
     logger.addHandler(handler)
     return logger
 
