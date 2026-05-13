@@ -16,7 +16,6 @@ class StatisticalStream(nn.Module):
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.Linear(128, output_dim),
-            nn.ReLU()
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

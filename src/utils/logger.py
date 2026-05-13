@@ -1,5 +1,5 @@
 import logging
-from torch.utils.tensorboard import SummaryWriter
+
 
 def setup_logger(name, log_file, level=logging.INFO):
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -14,6 +14,7 @@ def setup_logger(name, log_file, level=logging.INFO):
 
 class TensorBoardLogger:
     def __init__(self, log_dir):
+        from torch.utils.tensorboard import SummaryWriter
         self.writer = SummaryWriter(log_dir)
         
     def log_scalar(self, tag, value, step):
