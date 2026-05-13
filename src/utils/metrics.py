@@ -55,7 +55,7 @@ def compute_t_dcf(
         # p_fa: bonafide sample predicted spoof (false alarm)
         p_fa = float(np.mean(predict_spoof[bona_mask]))
 
-        cost = (prior_bonafide * cost_miss * p_miss) + (prior_spoof * cost_fa * p_fa)
+        cost = (prior_spoof * cost_miss * p_miss) + (prior_bonafide * cost_fa * p_fa)
         if cost < best_cost:
             best_cost = cost
             best_threshold = float(threshold)

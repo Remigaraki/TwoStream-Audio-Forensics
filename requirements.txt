@@ -11,6 +11,7 @@ scipy
 numpy
 scikit-learn
 tensorboard
+wandb
 
 # Development and verification dependencies used by CI and local checks.
 flake8

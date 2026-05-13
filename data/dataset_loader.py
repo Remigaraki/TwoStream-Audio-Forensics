@@ -124,7 +124,7 @@ def fit_stream2_pipeline_from_protocol(
         file_path = dataset._resolve_audio_path(dataset.file_list[index])
         waveform_np, sample_rate = sf.read(file_path)
         waveform = torch.from_numpy(waveform_np).float()
-        waveform = process_waveform(waveform, sample_rate)
+        waveform = process_waveform(waveform, sample_rate, training=False)
         audio_arrays.append(waveform.squeeze(0).cpu().numpy())
         sample_rates.append(16000)
 
