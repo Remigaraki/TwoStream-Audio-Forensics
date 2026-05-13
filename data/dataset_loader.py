@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Dict, Optional
 
+import numpy as np
 import soundfile as sf
 import torch
 from torch.utils.data import Dataset
@@ -22,6 +23,7 @@ class ASVspoofDataset(Dataset):
         stream2_pipeline: Optional[Stream2ForensicFeaturePipeline] = None,
         return_stream2: bool = False,
         cache_stream2_features: bool = True,
+        training: bool = True,
     ):
         self.base_dir = Path(base_dir)
         self.protocol_file = Path(protocol_file)
@@ -29,6 +31,7 @@ class ASVspoofDataset(Dataset):
         self.stream2_pipeline = stream2_pipeline
         self.return_stream2 = return_stream2
         self.cache_stream2_features = cache_stream2_features
+        self.training = training
         self.file_list = []
         self.labels = []
         self._stream2_cache: Dict[str, torch.Tensor] = {}
@@ -77,7 +80,7 @@ class ASVspoofDataset(Dataset):
 
         waveform_np, sample_rate = sf.read(file_path)
         waveform = torch.from_numpy(waveform_np).float()
-        waveform = process_waveform(waveform, sample_rate)
+        waveform = process_waveform(waveform, sample_rate, training=self.training)
 
         label = self.labels[idx]
         label_tensor = torch.tensor(label, dtype=torch.long)

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import pickle
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Iterable, Optional, Sequence
 
 import librosa
@@ -192,6 +194,26 @@ class Stream2ForensicFeaturePipeline:
         bispectrum_vector = self._project_bispectrum(bispectrum_matrix)
         combined = np.concatenate((lfcc_vector, bispectrum_vector), axis=0)
         return combined.astype(np.float32)
+
+    @property
+    def is_fitted(self) -> bool:
+        return self.pca is not None
+
+    def save(self, path) -> None:
+        """Serialise the fitted pipeline (PCA basis + config) to disk."""
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "wb") as fh:
+            pickle.dump(self, fh, protocol=pickle.HIGHEST_PROTOCOL)
+
+    @classmethod
+    def load(cls, path) -> "Stream2ForensicFeaturePipeline":
+        """Load a previously saved pipeline from disk."""
+        with open(path, "rb") as fh:
+            obj = pickle.load(fh)
+        if not isinstance(obj, cls):
+            raise TypeError(f"Expected {cls.__name__}, got {type(obj).__name__}")
+        return obj
 
     def transform_full(self, audio_array: np.ndarray, sr: Optional[int] = None) -> dict:
         current_sr = self.sample_rate if sr is None else sr

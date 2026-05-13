@@ -50,8 +50,10 @@ def compute_t_dcf(
 
     for threshold in thresholds:
         predict_spoof = y_score >= threshold
-        p_miss = float(np.mean(predict_spoof[bona_mask]))
-        p_fa = float(np.mean(~predict_spoof[spoof_mask]))
+        # p_miss: spoof sample predicted bonafide (missed detection)
+        p_miss = float(np.mean(~predict_spoof[spoof_mask]))
+        # p_fa: bonafide sample predicted spoof (false alarm)
+        p_fa = float(np.mean(predict_spoof[bona_mask]))
 
         cost = (prior_bonafide * cost_miss * p_miss) + (prior_spoof * cost_fa * p_fa)
         if cost < best_cost:

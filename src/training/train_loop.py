@@ -27,6 +27,12 @@ class TrainingConfig:
     pin_memory: bool = True
     checkpoint_path: Optional[str] = None
     log_dir: Optional[str] = None
+    # LR schedule: "cosine" (CosineAnnealingLR to eta_min=1e-6) or "none"
+    scheduler_type: str = "cosine"
+    # Weights & Biases — skipped gracefully if wandb is not installed
+    use_wandb: bool = False
+    wandb_project: str = "twostream-audio-forensics"
+    wandb_run_name: Optional[str] = None
 
 
 def set_seed(seed: int) -> None:
@@ -236,6 +242,29 @@ def fit_two_stream_model(
         weight_decay=config.weight_decay,
     )
 
+    if config.scheduler_type == "cosine":
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=config.epochs, eta_min=1e-6
+        )
+    else:
+        scheduler = None
+
+    # Optional W&B — silently skipped if not installed or not requested
+    _wandb = None
+    if config.use_wandb:
+        try:
+            import wandb as _wb
+            _wb.init(
+                project=config.wandb_project,
+                name=config.wandb_run_name,
+                config=config.__dict__,
+                reinit=True,
+            )
+            _wandb = _wb
+        except ImportError:
+            if logger is not None:
+                logger.warning("wandb not installed — W&B logging disabled")
+
     checkpoint_path = Path(config.checkpoint_path) if config.checkpoint_path else None
     if checkpoint_path is not None:
         checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
@@ -259,8 +288,10 @@ def fit_two_stream_model(
             device=device,
         )
 
+        current_lr = float(optimizer.param_groups[0]["lr"])
         epoch_metrics = {
             "epoch": float(epoch),
+            "lr": current_lr,
             "train_loss": float(train_metrics["loss"]),
             "train_eer": float(train_metrics["eer"]),
             "train_t_dcf": float(train_metrics["t_dcf"]),
@@ -270,10 +301,15 @@ def fit_two_stream_model(
         }
         history.append(epoch_metrics)
 
+        if scheduler is not None:
+            scheduler.step()
+
         if logger is not None:
             logger.info(
-                "Epoch %s | train_loss=%.4f val_loss=%.4f train_eer=%.4f val_eer=%.4f train_tdcf=%.4f val_tdcf=%.4f",
+                "Epoch %s | lr=%.2e | train_loss=%.4f val_loss=%.4f "
+                "train_eer=%.4f val_eer=%.4f train_tdcf=%.4f val_tdcf=%.4f",
                 epoch,
+                current_lr,
                 epoch_metrics["train_loss"],
                 epoch_metrics["val_loss"],
                 epoch_metrics["train_eer"],
@@ -289,6 +325,10 @@ def fit_two_stream_model(
             tb_logger.log_scalar("eer/val", epoch_metrics["val_eer"], epoch)
             tb_logger.log_scalar("tdcf/train", epoch_metrics["train_t_dcf"], epoch)
             tb_logger.log_scalar("tdcf/val", epoch_metrics["val_t_dcf"], epoch)
+            tb_logger.log_scalar("lr", current_lr, epoch)
+
+        if _wandb is not None:
+            _wandb.log(epoch_metrics, step=epoch)
 
         if checkpoint_path is not None and not math.isnan(epoch_metrics["val_eer"]) and epoch_metrics["val_eer"] < best_val_eer:
             best_val_eer = epoch_metrics["val_eer"]
@@ -297,10 +337,14 @@ def fit_two_stream_model(
                     "epoch": epoch,
                     "model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict() if scheduler else None,
                     "config": config.__dict__,
                     "metrics": epoch_metrics,
                 },
                 checkpoint_path,
             )
+
+    if _wandb is not None:
+        _wandb.finish()
 
     return history
