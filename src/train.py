@@ -1,230 +1,297 @@
-"""
-Training entry point supporting all three experimental setups.
+"""Training entry point for TwoStream deepfake audio detection.
 
 Usage
 -----
-    # Full fused model (Setup C), 80 epochs
-    python -m src.train --setup C \\
-        --data_dir /content/drive/MyDrive/data/ASVspoof5 \\
-        --protocol_train protocols/train.txt \\
-        --epochs 80 --batch_size 32 --use_wandb
+    python src/train.py --setup A --manifest path/to/manifest.csv \
+        --pca_path data/pca_model/pca.pkl --ckpt_dir checkpoints/ --epochs 50
 
-    # Stream 1 ablation (Setup A), 50 epochs
-    python -m src.train --setup A \\
-        --data_dir /content/drive/MyDrive/data/ASVspoof5 \\
-        --protocol_train protocols/train.txt \\
-        --epochs 50 --batch_size 32
+    python src/train.py --setup C --manifest path/to/manifest.csv \
+        --pca_path data/pca_model/pca.pkl --ckpt_dir checkpoints/ --epochs 80 --use_wandb
 
 Setups
 ------
-    A — Stream 1 only  (RawNet2Encoder + classifier, stats input ignored)
-    B — Stream 2 only  (StatisticalStream + classifier, audio input ignored)
+    A — Stream 1 only  (RawNet2Encoder + classifier)
+    B — Stream 2 only  (Stream2 + classifier)
     C — Full fusion    (TwoStreamFusionNet)
-"""
 
+Special flags
+-------------
+    --synthetic_dry_run : generate random tensors instead of loading from disk
+                          (useful for CI / unit tests)
+"""
 from __future__ import annotations
 
 import argparse
-import math
+import csv
+import os
+import random
+import sys
+import tempfile
 from pathlib import Path
 
+import numpy as np
 import torch
 import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset, random_split
 
-from data.dataset_loader import ASVspoofDataset, fit_stream2_pipeline_from_protocol
-from src.fusion.two_stream_net import StatisticalStream, TwoStreamFusionNet
-from src.stream1.rawnet2 import RawNet2Encoder
-from src.stream2.extract_bispectrum import Stream2ForensicFeaturePipeline
-from src.training.train_loop import (
-    TrainingConfig,
-    build_two_stream_loaders,
-    fit_two_stream_model,
-    set_seed,
-)
-from src.utils.logger import setup_logger
+# Ensure project root is importable
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from src.fusion.two_stream_net import TwoStreamFusionNet
+from src.eval.metrics import compute_eer
 
 
 # ---------------------------------------------------------------------------
-# Per-setup model wrappers
+# Synthetic dataset (for --synthetic_dry_run)
 # ---------------------------------------------------------------------------
 
-class _SetupAModel(nn.Module):
-    """Stream 1 only — stats tensor is accepted but ignored."""
+class _SyntheticDataset(Dataset):
+    """100 random [1, 64000] waveforms with random 0/1 labels."""
 
-    def __init__(self):
-        super().__init__()
-        self.encoder = RawNet2Encoder(output_dim=256)
-        self.classifier = nn.Sequential(
-            nn.Linear(256, 128),
-            nn.BatchNorm1d(128),
-            nn.SiLU(),
-            nn.Dropout(0.3),
-            nn.Linear(128, 2),
-        )
+    def __init__(self, n: int = 100, seed: int = 42):
+        rng = torch.Generator()
+        rng.manual_seed(seed)
+        self.data = torch.randn(n, 1, 64000, generator=rng)
+        self.labels = torch.randint(0, 2, (n,), generator=rng).float()
 
-    def forward(self, audio: torch.Tensor, stats: torch.Tensor) -> torch.Tensor:
-        return self.classifier(self.encoder(audio))
+    def __len__(self) -> int:
+        return len(self.data)
 
-
-class _SetupBModel(nn.Module):
-    """Stream 2 only — audio tensor is accepted but ignored."""
-
-    def __init__(self):
-        super().__init__()
-        self.stream2 = StatisticalStream(input_dim=248, output_dim=64)
-        self.classifier = nn.Sequential(
-            nn.Linear(64, 32),
-            nn.BatchNorm1d(32),
-            nn.SiLU(),
-            nn.Dropout(0.2),
-            nn.Linear(32, 2),
-        )
-
-    def forward(self, audio: torch.Tensor, stats: torch.Tensor) -> torch.Tensor:
-        return self.classifier(self.stream2(stats))
-
-
-def build_model(setup: str) -> nn.Module:
-    """Return the appropriate model for setup A, B, or C."""
-    setup = setup.upper()
-    if setup == "A":
-        return _SetupAModel()
-    if setup == "B":
-        return _SetupBModel()
-    if setup == "C":
-        return TwoStreamFusionNet()
-    raise ValueError(f"Unknown setup '{setup}'. Choose A, B, or C.")
+    def __getitem__(self, idx: int):
+        return self.data[idx], self.labels[idx]
 
 
 # ---------------------------------------------------------------------------
-# CLI
+# Manifest dataset
+# ---------------------------------------------------------------------------
+
+class _ManifestDataset(Dataset):
+    """CSV manifest dataset. Each row: path,label,split"""
+
+    def __init__(self, manifest_path: str, split: str, data_root: str | None = None):
+        self.records = []
+        self.data_root = Path(data_root) if data_root else None
+        with open(manifest_path, "r", encoding="utf-8") as fh:
+            reader = csv.DictReader(fh)
+            for row in reader:
+                if row.get("split", "train") == split:
+                    self.records.append(row)
+
+        if not self.records:
+            raise ValueError(f"No records for split='{split}' in {manifest_path}")
+
+    def __len__(self) -> int:
+        return len(self.records)
+
+    def __getitem__(self, idx: int):
+        import soundfile as sf
+        import torchaudio.functional as F_audio
+
+        rec = self.records[idx]
+        label = float(int(rec["label"]))
+
+        audio_path = rec["path"]
+        if self.data_root is not None and not Path(audio_path).is_absolute():
+            audio_path = str(self.data_root / audio_path)
+
+        waveform_np, sr = sf.read(audio_path, dtype="float32", always_2d=False)
+        waveform = torch.from_numpy(waveform_np).float()
+        if waveform.dim() == 1:
+            waveform = waveform.unsqueeze(0)
+        elif waveform.dim() == 2 and waveform.shape[1] != 1:
+            waveform = waveform.T
+
+        if sr != 16000:
+            waveform = F_audio.resample(waveform, sr, 16000)
+
+        if waveform.shape[0] > 1:
+            waveform = waveform.mean(dim=0, keepdim=True)
+
+        target = 64000
+        length = waveform.shape[-1]
+        if length > target:
+            waveform = waveform[:, :target]
+        elif length < target:
+            waveform = nn.functional.pad(waveform, (0, target - length))
+
+        return waveform, torch.tensor(label)
+
+
+# ---------------------------------------------------------------------------
+# Argument parsing
 # ---------------------------------------------------------------------------
 
 def _parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(
-        description="TwoStream deepfake audio detection — training entry point"
-    )
-    p.add_argument(
-        "--setup", required=True, choices=["A", "B", "C"],
-        help="A=Stream1 only  B=Stream2 only  C=Full fusion",
-    )
-    p.add_argument("--data_dir", required=True, help="Root directory containing audio files")
-    p.add_argument("--protocol_train", required=True, help="Training protocol file")
-    p.add_argument("--pca_path", default=None,
-                   help="Path to a pre-fitted pca.pkl. "
-                        "If absent, PCA is fitted from --protocol_train and saved automatically.")
-    p.add_argument("--max_fit_samples", type=int, default=2000,
-                   help="Max audio samples used to fit the Stream 2 PCA (default: 2000)")
+    p = argparse.ArgumentParser(description="TwoStream training entry point")
+    p.add_argument("--setup", required=True, choices=["A", "B", "C"])
     p.add_argument("--epochs", type=int, default=50)
-    p.add_argument("--batch_size", type=int, default=32)
     p.add_argument("--lr", type=float, default=1e-4)
-    p.add_argument("--weight_decay", type=float, default=1e-4)
-    p.add_argument("--scheduler", choices=["cosine", "none"], default="cosine")
-    p.add_argument("--checkpoint_dir", default="checkpoints",
-                   help="Directory for saving best checkpoints and logs")
-    p.add_argument("--use_wandb", action="store_true", help="Enable Weights & Biases logging")
-    p.add_argument("--wandb_project", default="twostream-audio-forensics")
-    p.add_argument("--seed", type=int, default=42)
-    p.add_argument("--num_workers", type=int, default=2)
+    p.add_argument("--batch_size", type=int, default=32)
+    p.add_argument("--manifest", required=False, default=None)
+    p.add_argument("--pca_path", default=None)
+    p.add_argument("--ckpt_dir", required=True)
+    p.add_argument("--resume_from", default=None)
+    p.add_argument("--use_wandb", action="store_true")
+    p.add_argument("--data_root", default=None)
+    p.add_argument("--synthetic_dry_run", action="store_true",
+                   help="Use synthetic random tensors (skips --manifest)")
     return p.parse_args()
 
 
 # ---------------------------------------------------------------------------
-# Main
+# Training loop
 # ---------------------------------------------------------------------------
 
-def main() -> None:
-    args = _parse_args()
-    set_seed(args.seed)
-
-    checkpoint_dir = Path(args.checkpoint_dir)
-    checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    log_dir = checkpoint_dir / "logs"
-    log_dir.mkdir(parents=True, exist_ok=True)
-
-    logger = setup_logger(
-        f"train_setup_{args.setup}",
-        log_dir / f"setup_{args.setup}.log",
-    )
-    logger.info(
-        "Setup %s | epochs=%d | batch=%d | lr=%g | scheduler=%s",
-        args.setup, args.epochs, args.batch_size, args.lr, args.scheduler,
-    )
+def train(args: argparse.Namespace) -> None:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
 
     # ------------------------------------------------------------------
-    # Stream 2 pipeline (PCA) — load or fit
+    # Dataset
     # ------------------------------------------------------------------
-    pca_path = Path(args.pca_path) if args.pca_path else checkpoint_dir / "pca.pkl"
-    if pca_path.exists():
-        logger.info("Loading Stream 2 pipeline from %s", pca_path)
-        pipeline = Stream2ForensicFeaturePipeline.load(pca_path)
+    if args.synthetic_dry_run:
+        full_ds = _SyntheticDataset(n=100)
+        n_val = 20
+        n_train = len(full_ds) - n_val
+        train_ds, val_ds = random_split(
+            full_ds, [n_train, n_val],
+            generator=torch.Generator().manual_seed(42),
+        )
     else:
-        logger.info(
-            "Fitting Stream 2 pipeline on up to %d samples from %s …",
-            args.max_fit_samples, args.protocol_train,
-        )
-        pipeline = fit_stream2_pipeline_from_protocol(
-            args.data_dir,
-            args.protocol_train,
-            max_items=args.max_fit_samples,
-        )
-        pipeline.save(pca_path)
-        logger.info("Pipeline saved to %s", pca_path)
+        if args.manifest is None:
+            raise ValueError("--manifest is required unless --synthetic_dry_run is set")
+        train_ds = _ManifestDataset(args.manifest, split="train", data_root=args.data_root)
+        val_ds = _ManifestDataset(args.manifest, split="val", data_root=args.data_root)
 
-    # ------------------------------------------------------------------
-    # Dataset & loaders
-    # ------------------------------------------------------------------
-    train_dataset = ASVspoofDataset(
-        args.data_dir,
-        args.protocol_train,
-        stream2_pipeline=pipeline,
-        return_stream2=True,
-        training=True,
+    train_loader = DataLoader(
+        train_ds, batch_size=args.batch_size, shuffle=True, drop_last=False
     )
-    logger.info("Training dataset: %d samples", len(train_dataset))
-
-    train_loader, val_loader = build_two_stream_loaders(
-        train_dataset,
-        batch_size=args.batch_size,
-        seed=args.seed,
-        num_workers=args.num_workers,
+    val_loader = DataLoader(
+        val_ds, batch_size=args.batch_size, shuffle=False, drop_last=False
     )
 
     # ------------------------------------------------------------------
     # Model
     # ------------------------------------------------------------------
-    model = build_model(args.setup)
-    n_params = sum(p.numel() for p in model.parameters())
-    logger.info("Model — Setup %s | %.2fM parameters", args.setup, n_params / 1e6)
+    pca_path = args.pca_path
+    if args.setup in ("B", "C") and pca_path is None:
+        raise ValueError(f"--pca_path is required for setup {args.setup}")
+
+    model = TwoStreamFusionNet(
+        pca_path=pca_path,
+        setup=args.setup,
+    ).to(device)
 
     # ------------------------------------------------------------------
-    # Training config
+    # Optimizer / loss / scheduler
     # ------------------------------------------------------------------
-    config = TrainingConfig(
-        epochs=args.epochs,
-        batch_size=args.batch_size,
-        learning_rate=args.lr,
-        weight_decay=args.weight_decay,
-        checkpoint_path=str(checkpoint_dir / f"best_setup_{args.setup}.pt"),
-        log_dir=str(log_dir),
-        scheduler_type=args.scheduler,
-        use_wandb=args.use_wandb,
-        wandb_project=args.wandb_project,
-        wandb_run_name=f"setup_{args.setup}",
-        num_workers=args.num_workers,
+    criterion = nn.BCELoss()
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=args.lr, weight_decay=1e-4
+    )
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", patience=3, factor=0.5
     )
 
     # ------------------------------------------------------------------
-    # Train
+    # Resume
     # ------------------------------------------------------------------
-    history = fit_two_stream_model(model, train_loader, val_loader, config, logger=logger)
+    start_epoch = 0
+    best_eer = float("inf")
+    if args.resume_from and Path(args.resume_from).exists():
+        ckpt = torch.load(args.resume_from, map_location=device)
+        model.load_state_dict(ckpt["model_state"])
+        optimizer.load_state_dict(ckpt["optimizer_state"])
+        start_epoch = ckpt.get("epoch", 0) + 1
+        best_eer = ckpt.get("val_eer", float("inf"))
+        print(f"Resumed from {args.resume_from} (epoch {start_epoch})")
 
-    valid_eers = [e["val_eer"] for e in history if not math.isnan(e["val_eer"])]
-    best_eer = min(valid_eers) if valid_eers else float("nan")
-    logger.info("Training complete. Best val EER: %.4f", best_eer)
-    print(f"\nSetup {args.setup} done. Best val EER: {best_eer:.4f}")
-    print(f"Checkpoint: {checkpoint_dir / f'best_setup_{args.setup}.pt'}")
+    # ------------------------------------------------------------------
+    # W&B
+    # ------------------------------------------------------------------
+    ckpt_dir = Path(args.ckpt_dir)
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
 
+    if args.use_wandb:
+        import wandb
+        wandb.init(project="twostream-audio-forensics", config=vars(args))
+
+    # ------------------------------------------------------------------
+    # Epoch loop
+    # ------------------------------------------------------------------
+    for epoch in range(start_epoch, args.epochs):
+        # Train
+        model.train()
+        running_loss = 0.0
+        for batch_x, batch_y in train_loader:
+            batch_x = batch_x.to(device)
+            batch_y = batch_y.float().to(device)
+
+            optimizer.zero_grad()
+            preds = model(batch_x).squeeze(1)  # [B]
+            loss = criterion(preds, batch_y)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item() * len(batch_x)
+
+        train_loss = running_loss / len(train_ds)
+
+        # Validate
+        model.eval()
+        all_scores, all_labels = [], []
+        with torch.no_grad():
+            for batch_x, batch_y in val_loader:
+                batch_x = batch_x.to(device)
+                preds = model(batch_x).squeeze(1).cpu().numpy()
+                all_scores.extend(preds.tolist())
+                all_labels.extend(batch_y.numpy().tolist())
+
+        val_eer = compute_eer(
+            np.array(all_scores, dtype=np.float32),
+            np.array(all_labels, dtype=np.int32),
+        )
+
+        # Scheduler step
+        scheduler.step(val_eer)
+        current_lr = optimizer.param_groups[0]["lr"]
+
+        print(
+            f"Epoch {epoch + 1} | "
+            f"Train Loss: {train_loss:.4f} | "
+            f"Val EER: {val_eer:.4f} | "
+            f"LR: {current_lr:.2e}"
+        )
+
+        # Save latest
+        latest_ckpt = {
+            "epoch": epoch,
+            "model_state": model.state_dict(),
+            "optimizer_state": optimizer.state_dict(),
+            "val_eer": val_eer,
+        }
+        torch.save(latest_ckpt, ckpt_dir / "latest.pt")
+
+        # Save best
+        if val_eer < best_eer:
+            best_eer = val_eer
+            torch.save(latest_ckpt, ckpt_dir / "best.pt")
+
+        if args.use_wandb:
+            import wandb
+            wandb.log({"train_loss": train_loss, "val_eer": val_eer, "lr": current_lr})
+
+    if args.use_wandb:
+        import wandb
+        wandb.finish()
+
+    print(f"\nTraining complete. Best val EER: {best_eer:.4f}")
+    print(f"Checkpoints saved to: {ckpt_dir.resolve()}")
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    main()
+    args = _parse_args()
+    train(args)

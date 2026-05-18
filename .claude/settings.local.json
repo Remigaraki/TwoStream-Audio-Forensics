@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import torchaudio; print\\(torchaudio.__version__\\)\")"
+    ]
+  }
+}
