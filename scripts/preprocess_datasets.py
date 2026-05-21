@@ -105,13 +105,22 @@ def _makedirs(path):
 # ---------------------------------------------------------------------------
 
 def _read_asv_tsv(tsv_path, nrows=None):
-    """Read an ASVspoof5 TSV, handling both headered and headerless formats."""
-    df = pd.read_csv(tsv_path, sep="\t", nrows=nrows)
-    # Headerless detection: if the first column header looks like a speaker ID
-    # (e.g. "T_4850") rather than a descriptive name, the TSV has no header.
+    """Read an ASVspoof5 TSV/SSV, handling headered and headerless formats.
+
+    ASVspoof5 files are sometimes space-separated with no header row.
+    Strategy: try tab first; if only one column results, retry with whitespace.
+    Then detect whether the first row is a header or data.
+    """
+    for sep in ("\t", r"\s+"):
+        df = pd.read_csv(tsv_path, sep=sep, nrows=nrows, engine="python")
+        if len(df.columns) > 1:
+            break
+
+    # Headerless detection: first column header looks like a data value
+    # (speaker ID pattern like "T_4850") rather than a descriptive name.
     first_col = str(df.columns[0])
-    if first_col[:2] in ("T_", "D_", "E_") or first_col.replace("_", "").isdigit():
-        df = pd.read_csv(tsv_path, sep="\t", header=None, nrows=nrows)
+    if first_col[:2] in ("T_", "D_", "E_") or (len(first_col) > 2 and first_col[1] == "_"):
+        df = pd.read_csv(tsv_path, sep=sep, header=None, nrows=nrows, engine="python")
         n_cols = len(df.columns)
         df.columns = _ASV5_COLS[:n_cols]
     return df
