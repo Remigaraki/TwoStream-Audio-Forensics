@@ -73,6 +73,14 @@ _ID_CANDIDATES    = ["uttID", "utt_id", "filename", "file", "id", "utterance_id"
 _LABEL_CANDIDATES = ["label", "key", "class", "target", "bonafide_spoof"]
 _SYS_CANDIDATES   = ["system_id", "attack_type", "codec", "spoof_type", "system", "vocoder"]
 
+# ASVspoof5 headerless TSV column layout (positional):
+#   0:speaker_id  1:utterance_id  2:gender  3-5:-  6:codec  7:system_id  8:label  9:-
+_ASV5_COLS = ["speaker_id", "utterance_id", "gender", "c3", "c4", "c5",
+              "codec", "system_id", "label", "c9"]
+_ASV5_ID_COL    = "utterance_id"
+_ASV5_LABEL_COL = "label"
+_ASV5_SYS_COL   = "system_id"
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -96,6 +104,19 @@ def _makedirs(path):
 # Step 1 — inspect TSV schema
 # ---------------------------------------------------------------------------
 
+def _read_asv_tsv(tsv_path, nrows=None):
+    """Read an ASVspoof5 TSV, handling both headered and headerless formats."""
+    df = pd.read_csv(tsv_path, sep="\t", nrows=nrows)
+    # Headerless detection: if the first column header looks like a speaker ID
+    # (e.g. "T_4850") rather than a descriptive name, the TSV has no header.
+    first_col = str(df.columns[0])
+    if first_col[:2] in ("T_", "D_", "E_") or first_col.replace("_", "").isdigit():
+        df = pd.read_csv(tsv_path, sep="\t", header=None, nrows=nrows)
+        n_cols = len(df.columns)
+        df.columns = _ASV5_COLS[:n_cols]
+    return df
+
+
 def step1_inspect_tsv(args):
     print("\n" + "═" * 55)
     print("  STEP 1 — ASVspoof 5 TSV Schema")
@@ -105,28 +126,27 @@ def step1_inspect_tsv(args):
     train_tsv = os.path.join(tsv_dir, ASV_TSV_FILES["train"])
 
     print(f"  Reading: {train_tsv}")
-    df5 = pd.read_csv(train_tsv, sep="\t", nrows=5)
+    df5 = _read_asv_tsv(train_tsv, nrows=5)
     print(f"\n  Columns : {df5.columns.tolist()}")
     print(f"\n  First 5 rows:")
     print(df5.to_string())
 
-    cols = df5.columns.tolist()
-    id_col    = args.filename_col or _detect_col(cols, _ID_CANDIDATES)
-    label_col = args.label_col    or _detect_col(cols, _LABEL_CANDIDATES)
-    sys_col   = args.system_col   or _detect_col(cols, _SYS_CANDIDATES)
+    cols      = df5.columns.tolist()
+    id_col    = args.filename_col or _detect_col(cols, _ID_CANDIDATES)    or _ASV5_ID_COL
+    label_col = args.label_col    or _detect_col(cols, _LABEL_CANDIDATES) or _ASV5_LABEL_COL
+    sys_col   = args.system_col   or _detect_col(cols, _SYS_CANDIDATES)   or _ASV5_SYS_COL
 
-    print(f"\n  Auto-detected columns:")
-    print(f"    filename_col : {id_col}")
-    print(f"    label_col    : {label_col}")
-    print(f"    system_col   : {sys_col}")
-
-    if id_col is None or label_col is None:
-        print(f"\n  ❌ Could not auto-detect required columns.")
-        print(f"     Re-run with: --filename_col <col> --label_col <col>")
+    # Validate detected columns exist in the dataframe
+    missing = [c for c in [id_col, label_col] if c not in cols]
+    if missing:
+        print(f"\n  ❌ Columns not found in TSV: {missing}")
+        print(f"     Available columns: {cols}")
         raise SystemExit(1)
 
-    print(f"\n  ✅ Proceeding with filename_col={id_col!r}  "
-          f"label_col={label_col!r}  system_col={sys_col!r}")
+    print(f"\n  ✅ Columns confirmed:")
+    print(f"    filename_col : {id_col!r}  → e.g. {df5[id_col].iloc[0]!r}")
+    print(f"    label_col    : {label_col!r}  → e.g. {df5[label_col].iloc[0]!r}")
+    print(f"    system_col   : {sys_col!r}  → e.g. {df5[sys_col].iloc[0] if sys_col in cols else 'N/A'!r}")
     return id_col, label_col, sys_col
 
 
@@ -228,7 +248,7 @@ def step2b_copy_asvspoof(args):
 # ---------------------------------------------------------------------------
 
 def _parse_asv_tsv(tsv_path, filename_col, label_col, system_col=None):
-    df = pd.read_csv(tsv_path, sep="\t")
+    df = _read_asv_tsv(tsv_path)
     label_map   = {}
     vocoder_map = {}
     for _, row in df.iterrows():
