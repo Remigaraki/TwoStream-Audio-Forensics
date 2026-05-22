@@ -9,7 +9,7 @@ collate_fn  returns ([batch, 1, 64000], [batch])
 """
 from __future__ import annotations
 
-import json
+import csv
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -64,8 +64,8 @@ class HearingRealityDataset(Dataset):
     # ------------------------------------------------------------------
 
     def _load_manifest(self) -> None:
-        with open(self.manifest_path, "r", encoding="utf-8") as fh:
-            all_records = json.load(fh)
+        with open(self.manifest_path, "r", encoding="utf-8", newline="") as fh:
+            all_records = list(csv.DictReader(fh))
 
         self._records = [r for r in all_records if r.get("split") == self.split]
         if not self._records:
@@ -82,7 +82,7 @@ class HearingRealityDataset(Dataset):
 
     def __getitem__(self, idx: int) -> Tuple[Tensor, int]:
         record = self._records[idx]
-        audio_path = Path(record["path"])
+        audio_path = Path(record.get("file_path") or record["path"])
         label = int(record["label"])
 
         # Load with soundfile (avoids torchcodec dependency)
