@@ -41,20 +41,18 @@ def estimate_bispectrum(
 
     B_sum = np.zeros((half, half), dtype=np.complex128)
 
-    for start in starts:
-        frame = waveform[start : start + window_size]
-        # Hamming window to reduce spectral leakage
-        frame = frame * np.hamming(window_size)
-        Xk = np.fft.fft(frame)[:half]   # one-sided, shape (half,)
+    # Precompute valid (i, j) index pairs where i+j < half (lower triangle)
+    i_idx, j_idx = np.tril_indices(half)
+    ij_idx = i_idx + j_idx
+    valid = ij_idx < half
+    i_v, j_v, ij_v = i_idx[valid], j_idx[valid], ij_idx[valid]
 
-        # Bi-periodogram: B(i,j) = X[i] * X[j] * conj(X[i+j])
-        for i in range(half):
-            max_j = half - i
-            if max_j <= 0:
-                break
-            js = np.arange(max_j)
-            ij = i + js  # i+j indices, all < half
-            B_sum[i, :max_j] += Xk[i] * Xk[js] * np.conj(Xk[ij])
+    hamming = np.hamming(window_size)
+
+    for start in starts:
+        frame = waveform[start : start + window_size] * hamming
+        Xk = np.fft.fft(frame)[:half]
+        B_sum[i_v, j_v] += Xk[i_v] * Xk[j_v] * np.conj(Xk[ij_v])
 
     B_hat = np.abs(B_sum / K).astype(np.float32)
     return B_hat
