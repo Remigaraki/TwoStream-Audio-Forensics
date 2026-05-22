@@ -36,22 +36,27 @@ def _generate_synthetic_bispectra(n: int = 500) -> list[np.ndarray]:
 
 
 def _load_bispectra_from_manifest(
-    manifest_path: str, split: str, n_samples: int
+    manifest_path: str, split: str, n_samples: int, data_root: str | None = None
 ) -> list[np.ndarray]:
-    import json
+    import csv
     import soundfile as sf
 
-    with open(manifest_path, "r", encoding="utf-8") as fh:
-        records = json.load(fh)
+    with open(manifest_path, "r", encoding="utf-8", newline="") as fh:
+        records = list(csv.DictReader(fh))
 
-    records = [r for r in records if r.get("split") == split]
+    records = [r for r in records if r.get("split") == split and r.get("label") == "0"]
     records = records[:n_samples]
     if not records:
-        raise ValueError(f"No records for split='{split}' in {manifest_path}")
+        raise ValueError(f"No bonafide records for split='{split}' in {manifest_path}")
 
     bispectra = []
     for i, rec in enumerate(records):
-        waveform_np, sr = sf.read(rec["path"], dtype="float32", always_2d=False)
+        fpath = rec.get("file_path") or rec.get("path")
+        if fpath is None:
+            raise KeyError(f"Manifest has neither 'file_path' nor 'path' column. Keys: {list(rec.keys())}")
+        if data_root and not Path(fpath).is_absolute():
+            fpath = str(Path(data_root) / fpath)
+        waveform_np, sr = sf.read(fpath, dtype="float32", always_2d=False)
         if waveform_np.ndim == 2:
             waveform_np = waveform_np.mean(axis=1)
         # Resample to 16000 if needed
@@ -88,6 +93,10 @@ def main() -> None:
         "--synthetic", action="store_true",
         help="Use 500 synthetic random waveforms instead of real data"
     )
+    parser.add_argument(
+        "--data_root", default=None,
+        help="Root directory to prepend to relative paths in the manifest"
+    )
     args = parser.parse_args()
 
     print("=" * 60)
@@ -101,7 +110,7 @@ def main() -> None:
         print(f"Mode: REAL DATA  manifest={args.manifest}  split={args.split}")
         print(f"Loading up to {args.n_samples} samples …")
         bispectra = _load_bispectra_from_manifest(
-            args.manifest, args.split, args.n_samples
+            args.manifest, args.split, args.n_samples, args.data_root
         )
 
     print(f"\nFitting BispectralPCA on {len(bispectra)} bispectra …")
