@@ -90,9 +90,9 @@ class _ManifestDataset(Dataset):
         rec = self.records[idx]
         label = float(int(rec["label"]))
 
-        audio_path = rec["path"]
-        if self.data_root is not None and not Path(audio_path).is_absolute():
-            audio_path = str(self.data_root / audio_path)
+        audio_path = rec.get("file_path") or rec["path"]
+        if self.data_root is not None:
+            audio_path = str(self.data_root / Path(audio_path).name)
 
         waveform_np, sr = sf.read(audio_path, dtype="float32", always_2d=False)
         waveform = torch.from_numpy(waveform_np).float()
@@ -132,7 +132,12 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--ckpt_dir", required=True)
     p.add_argument("--resume_from", default=None)
     p.add_argument("--use_wandb", action="store_true")
-    p.add_argument("--data_root", default=None)
+    p.add_argument("--data_root", default=None,
+                   help="Override directory for BOTH train and val audio files (by basename).")
+    p.add_argument("--train_data_root", default=None,
+                   help="Override directory for train audio files only (by basename).")
+    p.add_argument("--val_data_root", default=None,
+                   help="Override directory for val audio files only (by basename).")
     p.add_argument("--synthetic_dry_run", action="store_true",
                    help="Use synthetic random tensors (skips --manifest)")
     return p.parse_args()
@@ -160,8 +165,10 @@ def train(args: argparse.Namespace) -> None:
     else:
         if args.manifest is None:
             raise ValueError("--manifest is required unless --synthetic_dry_run is set")
-        train_ds = _ManifestDataset(args.manifest, split="train", data_root=args.data_root)
-        val_ds = _ManifestDataset(args.manifest, split="val", data_root=args.data_root)
+        train_root = args.train_data_root or args.data_root
+        val_root   = args.val_data_root   or args.data_root
+        train_ds = _ManifestDataset(args.manifest, split="train", data_root=train_root)
+        val_ds   = _ManifestDataset(args.manifest, split="val",   data_root=val_root)
 
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True, drop_last=False
