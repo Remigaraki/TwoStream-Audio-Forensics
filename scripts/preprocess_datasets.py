@@ -517,6 +517,8 @@ def main():
                         help="Process only --dry_run_limit WaveFake files; skip ASVspoof copy")
     parser.add_argument("--dry_run_limit",  type=int, default=100,
                         help="Number of WaveFake files to process in dry-run mode (default: 100)")
+    parser.add_argument("--skip_wavefake",  action="store_true",
+                        help="Skip WaveFake resampling entirely; build manifest from ASVspoof5 only")
     args = parser.parse_args()
 
     # Step 1 — TSV schema
@@ -526,8 +528,12 @@ def main():
     system_col   = args.system_col   or auto_sys
 
     # Step 2a — resample WaveFake
-    limit        = args.dry_run_limit if args.dry_run else None
-    wavefake_dst = step2a_resample_wavefake(args, dry_run_limit=limit)
+    if args.skip_wavefake:
+        print("\n  [SKIP] WaveFake resampling skipped (--skip_wavefake).")
+        wavefake_dst = os.path.join(args.processed_root, "wavefake", "generated_audio")
+    else:
+        limit        = args.dry_run_limit if args.dry_run else None
+        wavefake_dst = step2a_resample_wavefake(args, dry_run_limit=limit)
 
     # Step 2b — copy ASVspoof 5
     if args.dry_run:
