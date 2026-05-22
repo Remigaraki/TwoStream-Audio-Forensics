@@ -310,29 +310,36 @@ def step2d_build_manifest(args, label_maps, vocoder_maps, wavefake_dst_root):
     unmatched = 0
 
     # ── ASVspoof 5 ────────────────────────────────────────────────────────────
-    for split in ["train", "val", "test"]:
-        part_dir = os.path.join(args.processed_root, "asvspoof5", split)
-        if not os.path.exists(part_dir):
-            continue
+    for split, src_folder in ASV_SRC_DIRS.items():
         lm = label_maps.get(split, {})
         vm = vocoder_maps.get(split, {})
 
-        for fname in os.listdir(part_dir):
-            if not fname.endswith(".flac"):
-                continue
-            uid = os.path.splitext(fname)[0]
-            if uid not in lm:
-                unmatched += 1
-                continue
-            label   = lm[uid]
-            vocoder = vm.get(uid) or ("bonafide" if label == 0 else "unknown_spoof")
-            rows.append({
-                "file_path":      os.path.join(part_dir, fname),
-                "label":          label,
-                "vocoder_type":   vocoder,
-                "dataset_source": "asvspoof5",
-                "split":          split,
-            })
+        if args.skip_asv_copy:
+            # Walk raw folders directly — avoids copying ~12 GB to Drive
+            search_dir = os.path.join(args.asvspoof_root, src_folder)
+        else:
+            search_dir = os.path.join(args.processed_root, "asvspoof5", split)
+
+        if not os.path.exists(search_dir):
+            continue
+
+        for dirpath, _, filenames in os.walk(search_dir):
+            for fname in filenames:
+                if not fname.endswith(".flac"):
+                    continue
+                uid = os.path.splitext(fname)[0]
+                if uid not in lm:
+                    unmatched += 1
+                    continue
+                label   = lm[uid]
+                vocoder = vm.get(uid) or ("bonafide" if label == 0 else "unknown_spoof")
+                rows.append({
+                    "file_path":      os.path.join(dirpath, fname),
+                    "label":          label,
+                    "vocoder_type":   vocoder,
+                    "dataset_source": "asvspoof5",
+                    "split":          split,
+                })
 
     # ── WaveFake ──────────────────────────────────────────────────────────────
     wf_by_vocoder: dict[str, list[str]] = defaultdict(list)
@@ -519,6 +526,8 @@ def main():
                         help="Number of WaveFake files to process in dry-run mode (default: 100)")
     parser.add_argument("--skip_wavefake",  action="store_true",
                         help="Skip WaveFake resampling entirely; build manifest from ASVspoof5 only")
+    parser.add_argument("--skip_asv_copy", action="store_true",
+                        help="Skip copying ASVspoof5 files; manifest points to raw paths directly (saves ~12 GB)")
     args = parser.parse_args()
 
     # Step 1 — TSV schema
@@ -536,8 +545,9 @@ def main():
         wavefake_dst = step2a_resample_wavefake(args, dry_run_limit=limit)
 
     # Step 2b — copy ASVspoof 5
-    if args.dry_run:
-        print("\n  [DRY RUN] Skipping ASVspoof 5 copy.")
+    if args.dry_run or args.skip_asv_copy:
+        reason = "DRY RUN" if args.dry_run else "SKIP"
+        print(f"\n  [{reason}] Skipping ASVspoof 5 copy — manifest will use raw paths.")
     else:
         step2b_copy_asvspoof(args)
 
