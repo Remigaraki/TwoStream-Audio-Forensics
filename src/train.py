@@ -226,11 +226,13 @@ def train(args: argparse.Namespace) -> None:
     # ------------------------------------------------------------------
     # Epoch loop
     # ------------------------------------------------------------------
+    n_train_batches = len(train_loader)
+    n_val_batches = len(val_loader)
     for epoch in range(start_epoch, args.epochs):
         # Train
         model.train()
         running_loss = 0.0
-        for batch_x, batch_y in train_loader:
+        for step, (batch_x, batch_y) in enumerate(train_loader):
             batch_x = batch_x.to(device)
             batch_y = batch_y.float().to(device)
 
@@ -241,17 +243,22 @@ def train(args: argparse.Namespace) -> None:
             optimizer.step()
             running_loss += loss.item() * len(batch_x)
 
+            if step % 50 == 0:
+                print(f"  [train] epoch {epoch+1} batch {step}/{n_train_batches}  loss={loss.item():.4f}", flush=True)
+
         train_loss = running_loss / len(train_ds)
 
         # Validate
         model.eval()
         all_scores, all_labels = [], []
         with torch.no_grad():
-            for batch_x, batch_y in val_loader:
+            for step, (batch_x, batch_y) in enumerate(val_loader):
                 batch_x = batch_x.to(device)
                 preds = model(batch_x).squeeze(1).cpu().numpy()
                 all_scores.extend(preds.tolist())
                 all_labels.extend(batch_y.numpy().tolist())
+                if step % 100 == 0:
+                    print(f"  [val]   epoch {epoch+1} batch {step}/{n_val_batches}", flush=True)
 
         val_eer = compute_eer(
             np.array(all_scores, dtype=np.float32),
