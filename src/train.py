@@ -149,7 +149,7 @@ def _parse_args() -> argparse.Namespace:
 
 def train(args: argparse.Namespace) -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Device: {device}")
+    print(f"[init] device={device}", flush=True)
 
     # ------------------------------------------------------------------
     # Dataset
@@ -167,8 +167,11 @@ def train(args: argparse.Namespace) -> None:
             raise ValueError("--manifest is required unless --synthetic_dry_run is set")
         train_root = args.train_data_root or args.data_root
         val_root   = args.val_data_root   or args.data_root
+        print(f"[init] reading manifest …", flush=True)
         train_ds = _ManifestDataset(args.manifest, split="train", data_root=train_root)
+        print(f"[init] train_ds={len(train_ds)} samples", flush=True)
         val_ds   = _ManifestDataset(args.manifest, split="val",   data_root=val_root)
+        print(f"[init] val_ds={len(val_ds)} samples", flush=True)
 
     train_loader = DataLoader(
         train_ds, batch_size=args.batch_size, shuffle=True, drop_last=False
@@ -176,6 +179,7 @@ def train(args: argparse.Namespace) -> None:
     val_loader = DataLoader(
         val_ds, batch_size=args.batch_size, shuffle=False, drop_last=False
     )
+    print(f"[init] loaders ready — {len(train_loader)} train batches, {len(val_loader)} val batches", flush=True)
 
     # ------------------------------------------------------------------
     # Model
@@ -184,10 +188,14 @@ def train(args: argparse.Namespace) -> None:
     if args.setup in ("B", "C") and pca_path is None:
         raise ValueError(f"--pca_path is required for setup {args.setup}")
 
+    print(f"[init] building model (setup={args.setup}) …", flush=True)
     model = TwoStreamFusionNet(
         pca_path=pca_path,
         setup=args.setup,
-    ).to(device)
+    )
+    print(f"[init] moving model to {device} …", flush=True)
+    model = model.to(device)
+    print(f"[init] model ready", flush=True)
 
     # ------------------------------------------------------------------
     # Optimizer / loss / scheduler
