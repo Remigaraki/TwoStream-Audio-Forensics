@@ -8,9 +8,11 @@ Tests
 3. test_transcode_no_nan     — no NaN for all 6 conditions
 4. test_dataset_item         — Dataset[0] → [1, 64000], integer label
 5. test_no_split_overlap     — no file-path overlap between train / val / test splits
+6. test_local_root_flat      — local_root + flat=True remaps paths to a flat directory
 """
 from __future__ import annotations
 
+import csv
 import json
 import os
 import shutil
@@ -146,6 +148,49 @@ def test_dataset_item(tiny_manifest):
 
 
 # ---------------------------------------------------------------------------
+# CSV manifest fixture (used by tests 5–6)
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def csv_manifest(tmp_path_factory) -> Path:
+    """
+    Manifest CSV + WAV files whose file_path values use a fake Drive prefix,
+    but whose audio lives in a separate flat directory — simulating the
+    /content/flac_train staging pattern.
+    """
+    base      = tmp_path_factory.mktemp("csv_dataset")
+    flat_dir  = base / "flat_audio"
+    flat_dir.mkdir()
+
+    fake_drive = "/content/drive/MyDrive/Processed"
+
+    splits_and_labels = [
+        ("train", 0), ("train", 1), ("train", 0),
+        ("val",   0), ("val",   1),
+        ("test",  0), ("test",  1),
+    ]
+    rows = []
+    for split, label in splits_and_labels:
+        fname = f"{split}_{label}_{len(rows)}.wav"
+        _write_sine_wav(str(flat_dir / fname), freq=440 + label * 100)
+        rows.append({
+            "file_path": f"{fake_drive}/asvspoof5/{split}/{fname}",
+            "label":     label,
+            "split":     split,
+            "vocoder_type":   "bonafide" if label == 0 else "A01",
+            "dataset_source": "asvspoof5",
+        })
+
+    manifest = base / "manifest.csv"
+    with manifest.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=list(rows[0].keys()))
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return manifest, flat_dir, fake_drive
+
+
+# ---------------------------------------------------------------------------
 # 5. No file-path overlap between splits
 # ---------------------------------------------------------------------------
 
@@ -168,3 +213,34 @@ def test_no_split_overlap(tiny_manifest):
             assert not overlap, (
                 f"File path overlap between '{s1}' and '{s2}': {overlap}"
             )
+
+
+# ---------------------------------------------------------------------------
+# 6. local_root + flat=True path remapping
+# ---------------------------------------------------------------------------
+
+def test_local_root_flat(csv_manifest):
+    """
+    With local_root + flat=True, each file_path in the manifest (which carries
+    a fake Drive prefix and subdirectory structure) must be resolved to
+    local_root/<filename> — matching the flat staged files on local SSD.
+    """
+    from src.pipeline.dataset import HearingRealityDataset
+
+    manifest, flat_dir, fake_drive = csv_manifest
+
+    ds = HearingRealityDataset(
+        manifest_path=manifest,
+        split="train",
+        augment=False,
+        local_root=flat_dir,
+        drive_root=fake_drive,
+        flat=True,
+    )
+    assert len(ds) > 0, "Dataset is empty"
+
+    waveform, label = ds[0]
+
+    assert isinstance(waveform, torch.Tensor), "Waveform must be a torch.Tensor"
+    assert waveform.shape == (1, N), f"Expected [1, {N}], got {waveform.shape}"
+    assert isinstance(label, int), f"Label must be int, got {type(label)}"

@@ -201,12 +201,17 @@ def train(args: argparse.Namespace) -> None:
     # Optimizer / loss / scheduler
     # ------------------------------------------------------------------
     criterion = nn.BCELoss()
+    weight_decay = 1e-3 if args.setup == "B" else 1e-4
     optimizer = torch.optim.Adam(
-        model.parameters(), lr=args.lr, weight_decay=1e-4
+        model.parameters(), lr=args.lr, weight_decay=weight_decay
     )
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="min", patience=3, factor=0.5
+        optimizer, mode="min", patience=5, factor=0.5
     )
+
+    # LR warmup for Setup C: linearly ramp from 1e-6 to target LR over 10 epochs
+    warmup_epochs = 10 if args.setup == "C" else 0
+    warmup_start_lr = 1e-6
 
     # ------------------------------------------------------------------
     # Resume
@@ -219,7 +224,7 @@ def train(args: argparse.Namespace) -> None:
         optimizer.load_state_dict(ckpt["optimizer_state"])
         start_epoch = ckpt.get("epoch", 0) + 1
         best_eer = ckpt.get("val_eer", float("inf"))
-        print(f"Resumed from {args.resume_from} (epoch {start_epoch})")
+        print(f"Resumed from {args.resume_from} (epoch {start_epoch})", flush=True)
 
     # ------------------------------------------------------------------
     # W&B
@@ -234,12 +239,23 @@ def train(args: argparse.Namespace) -> None:
     # ------------------------------------------------------------------
     # Epoch loop
     # ------------------------------------------------------------------
+    import time
     n_train_batches = len(train_loader)
     n_val_batches = len(val_loader)
+
     for epoch in range(start_epoch, args.epochs):
+
+        # LR warmup
+        if epoch < warmup_epochs:
+            warmup_lr = warmup_start_lr + (args.lr - warmup_start_lr) * (epoch + 1) / warmup_epochs
+            for pg in optimizer.param_groups:
+                pg["lr"] = warmup_lr
+
         # Train
         model.train()
         running_loss = 0.0
+        label_sum = 0.0
+        t0 = time.time()
         for step, (batch_x, batch_y) in enumerate(train_loader):
             batch_x = batch_x.to(device)
             batch_y = batch_y.float().to(device)
@@ -248,13 +264,21 @@ def train(args: argparse.Namespace) -> None:
             preds = model(batch_x).squeeze(1)  # [B]
             loss = criterion(preds, batch_y)
             loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
             running_loss += loss.item() * len(batch_x)
+            label_sum += batch_y.mean().item()
 
             if step % 50 == 0:
-                print(f"  [train] epoch {epoch+1} batch {step}/{n_train_batches}  loss={loss.item():.4f}", flush=True)
+                elapsed = time.time() - t0 + 1e-6
+                bps = (step + 1) / elapsed
+                print(f"  [train] epoch {epoch+1} batch {step}/{n_train_batches}"
+                      f"  loss={loss.item():.4f}  {bps:.1f} batches/sec", flush=True)
 
         train_loss = running_loss / len(train_ds)
+        mean_label = label_sum / n_train_batches
+        train_elapsed = time.time() - t0
+        train_bps = n_train_batches / (train_elapsed + 1e-6)
 
         # Validate
         model.eval()
@@ -273,16 +297,25 @@ def train(args: argparse.Namespace) -> None:
             np.array(all_labels, dtype=np.int32),
         )
 
-        # Scheduler step
-        scheduler.step(val_eer)
+        # Scheduler step (skip during warmup)
+        if epoch >= warmup_epochs:
+            scheduler.step(val_eer)
         current_lr = optimizer.param_groups[0]["lr"]
 
         print(
-            f"Epoch {epoch + 1} | "
-            f"Train Loss: {train_loss:.4f} | "
+            f"Epoch {epoch + 1:3d} | "
+            f"Loss: {train_loss:.4f} | "
             f"Val EER: {val_eer:.4f} | "
-            f"LR: {current_lr:.2e}"
+            f"LR: {current_lr:.2e} | "
+            f"Batches/sec: {train_bps:.1f} | "
+            f"Mean label: {mean_label:.3f}",
+            flush=True,
         )
+
+        if mean_label > 0.97:
+            print("  ⚠️  WARNING: mean label > 0.97 — DataLoader may not be sampling bonafide clips", flush=True)
+        if train_bps < 1.0:
+            print("  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training", flush=True)
 
         # Save latest
         latest_ckpt = {
@@ -297,6 +330,7 @@ def train(args: argparse.Namespace) -> None:
         if val_eer < best_eer:
             best_eer = val_eer
             torch.save(latest_ckpt, ckpt_dir / "best.pt")
+            print(f"  ✅ New best EER: {best_eer:.4f} — saved best.pt", flush=True)
 
         if args.use_wandb:
             import wandb
@@ -306,7 +340,7 @@ def train(args: argparse.Namespace) -> None:
         import wandb
         wandb.finish()
 
-    print(f"\nTraining complete. Best val EER: {best_eer:.4f}")
+    print(f"\nTraining complete. Best val EER: {best_eer:.4f}", flush=True)
     print(f"Checkpoints saved to: {ckpt_dir.resolve()}")
 
 

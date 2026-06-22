@@ -369,12 +369,70 @@ def step2d_build_manifest(args, label_maps, vocoder_maps, wavefake_dst_root):
             })
 
     manifest = pd.DataFrame(rows)
+
+    # ── Stratified 70/15/15 resplit (ignores official ASVspoof partitions) ────
+    rng2 = np.random.default_rng(42)
+    new_splits = np.empty(len(manifest), dtype=object)
+    for lbl in manifest["label"].unique():
+        idx = manifest.index[manifest["label"] == lbl].to_numpy()
+        rng2.shuffle(idx)
+        n      = len(idx)
+        n_tr   = int(n * 0.70)
+        n_va   = int(n * 0.15)
+        new_splits[idx[:n_tr]]        = "train"
+        new_splits[idx[n_tr:n_tr+n_va]] = "val"
+        new_splits[idx[n_tr+n_va:]]   = "test"
+    manifest["split"] = new_splits
+
     _makedirs(args.manifest_out)
     manifest.to_csv(args.manifest_out, index=False)
     print(f"  Saved {len(manifest):,} rows → {args.manifest_out}")
     print(f"  Unmatched ASVspoof files (not in TSV): {unmatched}")
 
+    by_split = {s: manifest[manifest["split"] == s] for s in ["train", "val", "test"]}
+    for s, sub in by_split.items():
+        nb = len(sub[sub["label"] == 0])
+        ns = len(sub[sub["label"] == 1])
+        print(f"  {s:<6}: {len(sub):>6,} files  (bonafide: {nb:,} | spoof: {ns:,})")
+
     return manifest, unmatched
+
+
+# ---------------------------------------------------------------------------
+# Resplit — fresh stratified 70/15/15 on an existing manifest.csv
+# ---------------------------------------------------------------------------
+
+def resplit_manifest(manifest_path, seed=42):
+    """Read manifest_path, apply a fresh stratified 70/15/15 split by label, save in-place."""
+    df = pd.read_csv(manifest_path)
+
+    rng = np.random.default_rng(seed)
+    new_splits = np.empty(len(df), dtype=object)
+
+    for lbl in df["label"].unique():
+        idx = df.index[df["label"] == lbl].to_numpy()
+        rng.shuffle(idx)
+        n    = len(idx)
+        n_tr = int(n * 0.70)
+        n_va = int(n * 0.15)
+        new_splits[idx[:n_tr]]           = "train"
+        new_splits[idx[n_tr:n_tr + n_va]] = "val"
+        new_splits[idx[n_tr + n_va:]]    = "test"
+
+    df["split"] = new_splits
+    df.to_csv(manifest_path, index=False)
+
+    total = len(df)
+    print(f"\nTotal files: {total:,}")
+    print()
+    for split in ["train", "val", "test"]:
+        sub = df[df["split"] == split]
+        nb  = len(sub[sub["label"] == 0])
+        ns  = len(sub[sub["label"] == 1])
+        print(f"{split:<6}: {len(sub):>7,} files  |  bonafide: {nb:,}  |  spoof: {ns:,}")
+
+    print(f"\nSaved → {manifest_path}")
+    return df
 
 
 # ---------------------------------------------------------------------------
@@ -506,13 +564,13 @@ def main():
     parser = argparse.ArgumentParser(
         description="Preprocess WaveFake + ASVspoof 5 into a unified manifest.csv"
     )
-    parser.add_argument("--wavefake_root",  required=True,
+    parser.add_argument("--wavefake_root",  default=None,
                         help="Root of WaveFake dataset (contains generated_audio/)")
-    parser.add_argument("--asvspoof_root",  required=True,
+    parser.add_argument("--asvspoof_root",  default=None,
                         help="Root of ASVspoof 5 dataset (contains Flac_T/, Flac_D/, Flac_E/, ASVspoof5_protocols/)")
-    parser.add_argument("--processed_root", required=True,
+    parser.add_argument("--processed_root", default=None,
                         help="Output root for resampled/copied files")
-    parser.add_argument("--manifest_out",   required=True,
+    parser.add_argument("--manifest_out",   default=None,
                         help="Output path for manifest.csv")
     parser.add_argument("--filename_col",   default=None,
                         help="TSV column for utterance ID (auto-detected if omitted)")
@@ -528,7 +586,24 @@ def main():
                         help="Skip WaveFake resampling entirely; build manifest from ASVspoof5 only")
     parser.add_argument("--skip_asv_copy", action="store_true",
                         help="Skip copying ASVspoof5 files; manifest points to raw paths directly (saves ~12 GB)")
+    parser.add_argument("--resplit", action="store_true",
+                        help="Re-do stratified 70/15/15 split on Datasets/manifest.csv and exit")
+    parser.add_argument("--manifest_path", default="Datasets/manifest.csv",
+                        help="Path to manifest.csv used by --resplit (default: Datasets/manifest.csv)")
     args = parser.parse_args()
+
+    # --resplit: standalone resplit of an existing manifest, no other steps needed
+    if args.resplit:
+        resplit_manifest(args.manifest_path)
+        return
+
+    # Full pipeline requires these args
+    for flag, val in [("--wavefake_root", args.wavefake_root),
+                      ("--asvspoof_root", args.asvspoof_root),
+                      ("--processed_root", args.processed_root),
+                      ("--manifest_out", args.manifest_out)]:
+        if val is None:
+            parser.error(f"{flag} is required for the full pipeline (omit only with --resplit)")
 
     # Step 1 — TSV schema
     auto_id, auto_label, auto_sys = step1_inspect_tsv(args)

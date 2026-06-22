@@ -23,19 +23,29 @@ from torch.utils.data import Dataset
 from src.pipeline.augment import transcode, CODEC_CONDITIONS
 
 
+_GDRIVE_DEFAULT = "/content/drive/MyDrive"
+
+
 class HearingRealityDataset(Dataset):
     """
     Manifest-driven dataset enforcing strict [1, 64000] waveforms.
 
     Parameters
     ----------
-    manifest_path  : path to a JSON file containing a list of records:
-                     [{"path": str, "label": int, "split": str}, ...]
+    manifest_path  : path to a CSV file whose rows have file_path, label, split
     split          : 'train', 'val', or 'test'
     augment        : if True, randomly apply codec transcoding
     augment_prob   : probability of applying augmentation per sample
     target_sr      : target sample rate (16000)
     clip_duration  : clip length in seconds (4.0 -> 64000 samples)
+    local_root     : if given, overrides the Google Drive prefix in manifest
+                     paths.  The portion of each path after ``drive_root`` is
+                     re-anchored under ``local_root``.
+    drive_root     : the Drive prefix to strip (default: /content/drive/MyDrive).
+                     Ignored when ``local_root`` is None.
+    flat           : if True, only the filename (no subdirectories) is appended
+                     to ``local_root``.  Use when audio files are staged into a
+                     single flat directory.  Ignored when ``local_root`` is None.
     """
 
     TARGET_LENGTH: int = 64000
@@ -48,6 +58,9 @@ class HearingRealityDataset(Dataset):
         augment_prob: float = 0.6,
         target_sr: int = 16000,
         clip_duration: float = 4.0,
+        local_root: str | Path | None = None,
+        drive_root: str | Path = _GDRIVE_DEFAULT,
+        flat: bool = False,
     ):
         self.manifest_path = Path(manifest_path)
         self.split = split
@@ -55,6 +68,9 @@ class HearingRealityDataset(Dataset):
         self.augment_prob = augment_prob
         self.target_sr = target_sr
         self.target_length = int(clip_duration * target_sr)  # 64000
+        self.local_root = Path(local_root) if local_root is not None else None
+        self.drive_root = Path(drive_root)
+        self.flat = flat
 
         self._records: List[dict] = []
         self._load_manifest()
@@ -83,6 +99,16 @@ class HearingRealityDataset(Dataset):
     def __getitem__(self, idx: int) -> Tuple[Tensor, int]:
         record = self._records[idx]
         audio_path = Path(record.get("file_path") or record["path"])
+        if self.local_root is not None:
+            if self.flat:
+                audio_path = self.local_root / audio_path.name
+            else:
+                try:
+                    rel = audio_path.relative_to(self.drive_root)
+                except ValueError:
+                    # Path doesn't start with drive_root; keep everything after root
+                    rel = Path(*audio_path.parts[1:]) if audio_path.is_absolute() else audio_path
+                audio_path = self.local_root / rel
         label = int(record["label"])
 
         # Load with soundfile (avoids torchcodec dependency)
