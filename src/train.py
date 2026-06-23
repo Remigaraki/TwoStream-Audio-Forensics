@@ -174,11 +174,11 @@ def train(args: argparse.Namespace) -> None:
         print(f"[init] val_ds={len(val_ds)} samples", flush=True)
 
     train_loader = DataLoader(
-        train_ds, batch_size=args.batch_size, shuffle=True, drop_last=False,
+        train_ds, batch_size=args.batch_size, shuffle=True, drop_last=True,
         num_workers=4, pin_memory=True, persistent_workers=True
     )
     val_loader = DataLoader(
-        val_ds, batch_size=args.batch_size, shuffle=False, drop_last=False,
+        val_ds, batch_size=args.batch_size, shuffle=False, drop_last=True,
         num_workers=4, pin_memory=True, persistent_workers=True
     )
     print(f"[init] loaders ready — {len(train_loader)} train batches, {len(val_loader)} val batches", flush=True)
