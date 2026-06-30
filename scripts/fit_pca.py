@@ -97,6 +97,11 @@ def main() -> None:
         "--data_root", default=None,
         help="Root directory to prepend to relative paths in the manifest"
     )
+    parser.add_argument(
+        "--n_components", type=int, default=128,
+        help="Number of PCA components K (B1 ablation sweeps 64/128/256). "
+             "Default 128 matches the production pca.pkl."
+    )
     args = parser.parse_args()
 
     print("=" * 60)
@@ -113,8 +118,8 @@ def main() -> None:
             args.manifest, args.split, args.n_samples, args.data_root
         )
 
-    print(f"\nFitting BispectralPCA on {len(bispectra)} bispectra …")
-    pca = BispectralPCA(n_components=128)
+    print(f"\nFitting BispectralPCA (K={args.n_components}) on {len(bispectra)} bispectra …")
+    pca = BispectralPCA(n_components=args.n_components)
     pca.fit(bispectra)
 
     ev = float(pca._pca.explained_variance_ratio_.sum())

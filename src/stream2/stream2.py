@@ -14,6 +14,7 @@ import torch
 import torch.nn as nn
 
 from src.stream2.lfcc import LFCCExtractor
+from src.stream2.cqcc import CQCCExtractor
 from src.stream2.bispectrum import estimate_bispectrum
 from src.stream2.pca_compressor import BispectralPCA
 from src.stream2.mlp import StatisticalMLP
@@ -40,14 +41,28 @@ class Stream2(nn.Module):
         pca: BispectralPCA | None = None,
         sample_rate: int = 16000,
         n_lfcc: int = 60,          # LFCCExtractor outputs 2*n_lfcc = 120
-        pca_dim: int = 128,
+        pca_dim: int | None = None,
         output_dim: int = 64,
+        features: str = "lfcc",
     ):
         super().__init__()
+        if features not in ("lfcc", "lfcc+cqcc"):
+            raise ValueError(f"features must be 'lfcc' or 'lfcc+cqcc', got '{features}'")
+        self.features = features
+
         self.lfcc = LFCCExtractor(sample_rate=sample_rate, n_lfcc=n_lfcc)
+        self.cqcc = CQCCExtractor(sample_rate=sample_rate, n_cqcc=n_lfcc) if features == "lfcc+cqcc" else None
+
         self.pca = pca  # BispectralPCA or None (identity / zero-pad if None)
+        # pca_dim drives the PCA fallback width AND the MLP input size, so it
+        # must track whatever K the loaded BispectralPCA was actually fit
+        # with (B1 ablation trains pca.pkl variants at K=64/128/256).
+        if pca_dim is None:
+            pca_dim = pca.n_components if pca is not None else 128
         self.pca_dim = pca_dim
-        total_dim = n_lfcc * 2 + pca_dim  # 120 + 128 = 248
+
+        cqcc_dim = n_lfcc * 2 if self.cqcc is not None else 0
+        total_dim = n_lfcc * 2 + cqcc_dim + pca_dim
         self.mlp = StatisticalMLP(input_dim=total_dim, output_dim=output_dim)
 
     # ------------------------------------------------------------------
@@ -99,13 +114,17 @@ class Stream2(nn.Module):
         lfcc_feat = self.lfcc(x)                     # [B, 120]
 
         # Step 2 — Bispectrum on CPU (numpy)
-        bisp_np = self._bispectrum_pca(x)             # [B, 128] numpy
+        bisp_np = self._bispectrum_pca(x)             # [B, pca_dim] numpy
 
         # Step 3 — Move PCA output back to device
-        bisp_feat = torch.from_numpy(bisp_np).float().to(device)  # [B, 128]
+        bisp_feat = torch.from_numpy(bisp_np).float().to(device)  # [B, pca_dim]
 
-        # Step 4 — Concatenate
-        combined = torch.cat([lfcc_feat, bisp_feat], dim=1)  # [B, 248]
+        # Step 4 — Concatenate (optionally with CQCC, B2 ablation)
+        feats = [lfcc_feat]
+        if self.cqcc is not None:
+            feats.append(self.cqcc(x))                # [B, 120]
+        feats.append(bisp_feat)
+        combined = torch.cat(feats, dim=1)
 
         # Step 5 — MLP
         return self.mlp(combined)                    # [B, 64]

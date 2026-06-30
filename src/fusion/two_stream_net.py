@@ -34,13 +34,28 @@ class TwoStreamFusionNet(nn.Module):
         'A' — Stream 1 only
         'B' — Stream 2 only
         'C' — Full fusion (default)
+    fusion : str
+        'attention' — cross-modal attention fusion (default, setup C only)
+        'concat'    — skip attention, concatenate E_raw[256] + E_stat[64] directly
+    features : str
+        'lfcc'       — LFCC only (default)
+        'lfcc+cqcc'  — LFCC + CQCC (setup B/C only)
     """
 
-    def __init__(self, pca_path: str | None = None, setup: str = "C"):
+    def __init__(
+        self,
+        pca_path: str | None = None,
+        setup: str = "C",
+        fusion: str = "attention",
+        features: str = "lfcc",
+    ):
         super().__init__()
         self.setup = setup.upper()
         if self.setup not in ("A", "B", "C"):
             raise ValueError(f"setup must be 'A', 'B', or 'C', got '{setup}'")
+        if fusion not in ("attention", "concat"):
+            raise ValueError(f"fusion must be 'attention' or 'concat', got '{fusion}'")
+        self.fusion_mode = fusion
 
         # ------------------------------------------------------------------
         # Stream 1 (always built for setup A and C)
@@ -55,7 +70,7 @@ class TwoStreamFusionNet(nn.Module):
             pca: BispectralPCA | None = None
             if pca_path is not None:
                 pca = BispectralPCA.load(pca_path)
-            self.stream2 = Stream2(pca=pca)
+            self.stream2 = Stream2(pca=pca, features=features)
 
         # ------------------------------------------------------------------
         # Fusion + classifier (setup-dependent)
@@ -80,10 +95,14 @@ class TwoStreamFusionNet(nn.Module):
             # AttentionFusion.output maps embed_dim*2 → embed_dim internally;
             # its output is [B, 256].  We concatenate the stat projection
             # outside for the [B, 320] requirement.
-            self.fusion = AttentionFusion(
-                stream1_dim=256, stream2_dim=64, embed_dim=256
-            )
-            # After fusion output is [B, 256]; we concat s2 embedding [B,64] → [B,320]
+            if self.fusion_mode == "attention":
+                self.fusion = AttentionFusion(
+                    stream1_dim=256, stream2_dim=64, embed_dim=256
+                )
+            # fusion_mode == "concat" (C2 ablation): no attention module —
+            # E_raw[256] and E_stat[64] are concatenated directly in forward().
+
+            # Either way the classifier sees [B, 320]
             self.classifier = nn.Sequential(
                 nn.Linear(320, 128),
                 nn.BatchNorm1d(128),
@@ -92,8 +111,11 @@ class TwoStreamFusionNet(nn.Module):
                 nn.Linear(128, 1),
                 nn.Sigmoid(),
             )
-            # Projection to produce the [B,64] token used for concat
-            self._stat_proj = nn.Linear(64, 64)
+            if self.fusion_mode == "attention":
+                # Projection to produce the [B,64] token used for concat
+                # (kept after classifier to preserve the original RNG-init
+                # order exactly, so A0/B0/C0 stay bit-identical to baseline).
+                self._stat_proj = nn.Linear(64, 64)
 
     # ------------------------------------------------------------------
     # Forward
@@ -117,6 +139,9 @@ class TwoStreamFusionNet(nn.Module):
         # Setup C — full fusion
         e_raw = self.stream1(x)              # [B, 256]
         e_stat = self.stream2(x)             # [B, 64]
-        fused = self.fusion(e_raw, e_stat)   # [B, 256]  (AttentionFusion output)
-        combined = torch.cat([fused, e_stat], dim=1)  # [B, 320]
+        if self.fusion_mode == "attention":
+            fused = self.fusion(e_raw, e_stat)             # [B, 256]
+            combined = torch.cat([fused, e_stat], dim=1)   # [B, 320]
+        else:  # concat — C2 ablation: skip attention entirely
+            combined = torch.cat([e_raw, e_stat], dim=1)   # [B, 320]
         return self.classifier(combined)     # [B, 1]
