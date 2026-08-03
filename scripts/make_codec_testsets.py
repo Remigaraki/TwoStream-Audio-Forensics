@@ -101,7 +101,7 @@ def main() -> None:
             else:
                 try:
                     samples = transcode(src, codec, bitrate)
-                    sf.write(str(dst), samples, 16000)
+                    sf.write(str(dst), samples, 16000, format="FLAC", subtype="PCM_16")
                     done += 1
                 except Exception as e:
                     failures.append({"utterance_id": row["utterance_id"], "file_path": src, "error": str(e)})
