@@ -49,6 +49,19 @@ CONDITION_LABELS = {
     "aac_128": "AAC 128k",
 }
 
+# Per-model marker/linestyle so every line figure is legible without colour
+# (grayscale print, colourblind readers) -- colour is kept only as a
+# secondary cue. Shared with scripts/build_deliverables.py so the minDCF
+# figure there stays visually consistent with these.
+MODEL_MARKERS = {"A0": "o", "A1": "s", "B0": "^", "C1": "D", "C2": "v"}
+MODEL_LINESTYLES = {
+    "A0": "solid",
+    "A1": "dashed",
+    "B0": "dashdot",
+    "C1": "dotted",
+    "C2": (0, (3, 1, 1, 1, 1, 1)),  # dense dash-dot-dot -- 5th style distinct from the 4 named ones
+}
+
 # ASVspoof 5 Track 1 minDCF parameters (official evaluation plan).
 # VERIFY these against the eval plan appendix before submission.
 PI_SPOOF = 0.05
@@ -318,44 +331,61 @@ def main():
 
     present = [c for c in CONDITIONS if c in eer_wide.columns and eer_wide[c].notna().any()]
 
-    fig, ax = plt.subplots(figsize=(9, 5.5))
+    # Legend sits outside the axes on the right for every figure below, so
+    # widen the figure and reserve the right margin for it consistently.
+    def _place_legend(ax):
+        ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), borderaxespad=0.0)
+
+    fig, ax = plt.subplots(figsize=(10.5, 5.5))
     for m in MODELS:
         if m not in eer_wide.index:
             continue
         vals = [eer_wide.loc[m, c] * 100 if pd.notna(eer_wide.loc[m, c]) else np.nan for c in present]
-        ax.plot(range(len(present)), vals, marker="o", label=MODEL_LABELS[m])
+        ax.plot(
+            range(len(present)), vals,
+            marker=MODEL_MARKERS[m], linestyle=MODEL_LINESTYLES[m],
+            markersize=7, linewidth=1.8,
+            markeredgecolor="white", markeredgewidth=0.8,
+            label=MODEL_LABELS[m],
+        )
     ax.set_xticks(range(len(present)))
     ax.set_xticklabels([CONDITION_LABELS[c] for c in present], rotation=20, ha="right")
     ax.set_ylabel("EER (%)")
     ax.set_xlabel("Condition")
     ax.set_title("Detection performance across codec conditions")
     ax.grid(alpha=0.3)
-    ax.legend()
+    _place_legend(ax)
     fig.tight_layout()
-    fig.savefig(os.path.join(fdir, "degradation_curve_eer.png"), dpi=200)
+    fig.savefig(os.path.join(fdir, "degradation_curve_eer.png"), dpi=300)
 
     ax.set_yscale("log")
     ax.set_ylabel("EER (%, log scale)")
     fig.tight_layout()
-    fig.savefig(os.path.join(fdir, "degradation_curve_eer_log.png"), dpi=200)
+    fig.savefig(os.path.join(fdir, "degradation_curve_eer_log.png"), dpi=300)
     plt.close(fig)
 
-    # A0 vs A1: the codec-augmentation control
+    # A0 vs A1: the codec-augmentation control. Bar chart, so marker/linestyle
+    # don't apply -- use a hatch pattern per bar as the grayscale-safe cue
+    # instead, on top of colour.
     if {"A0", "A1"}.issubset(set(eer_wide.index)):
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=(9.5, 5))
         x = np.arange(len(present))
         w = 0.38
+        hatches = {"A0": "", "A1": "///"}
         for i, m in enumerate(["A0", "A1"]):
             vals = [eer_wide.loc[m, c] * 100 if pd.notna(eer_wide.loc[m, c]) else 0 for c in present]
-            ax.bar(x + (i - 0.5) * w, vals, w, label=MODEL_LABELS[m])
+            ax.bar(
+                x + (i - 0.5) * w, vals, w, label=MODEL_LABELS[m],
+                hatch=hatches[m], edgecolor="black", linewidth=0.6,
+            )
         ax.set_xticks(x)
         ax.set_xticklabels([CONDITION_LABELS[c] for c in present], rotation=20, ha="right")
         ax.set_ylabel("EER (%)")
         ax.set_title("Effect of codec augmentation (A0 vs A1)")
         ax.grid(alpha=0.3, axis="y")
-        ax.legend()
+        _place_legend(ax)
         fig.tight_layout()
-        fig.savefig(os.path.join(fdir, "control_a0_vs_a1.png"), dpi=200)
+        fig.savefig(os.path.join(fdir, "control_a0_vs_a1.png"), dpi=300)
         plt.close(fig)
 
     print(f"\nfigures -> {fdir}")
