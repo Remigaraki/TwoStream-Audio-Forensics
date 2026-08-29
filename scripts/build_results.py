@@ -14,9 +14,17 @@ Usage:
 import argparse
 import itertools
 import os
+import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+# McNemar's test itself lives in scripts/mcnemar_test.py, which is canonical
+# (it produced the run logs referenced in the thesis notes). Import it rather
+# than reimplementing, so this script can never silently drift from it again.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from mcnemar_test import mcnemar_test as _mcnemar_stat, _binarise_at_eer
 
 # ---------------------------------------------------------------- config
 
@@ -116,19 +124,27 @@ def compute_cllr(scores, labels, eps=1e-12):
     return float(0.5 * (spoof_term + bona_term))
 
 
-def mcnemar(pred_a, pred_b, truth):
-    """Paired McNemar with continuity correction. Returns (b, c, chi2, p)."""
-    from scipy.stats import chi2 as chi2_dist
+def mcnemar(score_a, score_b, truth):
+    """Paired McNemar's test -- thin wrapper around scripts.mcnemar_test's
+    canonical implementation. Returns (n01, n10, chi2, p).
 
+    Predictions are binarised at each side's own EER threshold from `score`
+    (via mcnemar_test._binarise_at_eer), NOT read from the committed `pred`
+    column: that column and a threshold recomputed from the score column can
+    disagree on rare boundary rows (see scripts/mcnemar_test.py docstring /
+    thesis notes on the McNemar discrepancy), and mcnemar_test.py's numbers
+    are the canonical ones. The statistic/p-value formula itself (Yates
+    continuity correction, chi2 vs. exact-binomial branch for small n) is
+    untouched here -- it's whatever _mcnemar_stat (imported) does.
+    """
+    pred_a = _binarise_at_eer(truth, score_a)
+    pred_b = _binarise_at_eer(truth, score_b)
     a_ok = pred_a == truth
     b_ok = pred_b == truth
     n01 = int(np.sum(a_ok & ~b_ok))  # A right, B wrong
     n10 = int(np.sum(~a_ok & b_ok))  # A wrong, B right
-    if n01 + n10 == 0:
-        return n01, n10, 0.0, 1.0
-    chi2 = (abs(n01 - n10) - 1) ** 2 / (n01 + n10)
-    p = float(chi2_dist.sf(chi2, 1))
-    return n01, n10, float(chi2), p
+    chi2, p = _mcnemar_stat(truth, pred_a, pred_b)
+    return n01, n10, chi2, p
 
 
 # ---------------------------------------------------------------- io
@@ -139,6 +155,8 @@ def load(results_dir, model, condition):
     if not os.path.exists(path):
         return None
     df = pd.read_csv(path)
+    # 'pred' is required for schema/provenance even though McNemar below now
+    # recomputes its own predictions from 'score' rather than reading it.
     need = {"utterance_id", "true_label", "score", "pred"}
     missing = need - set(df.columns)
     if missing:
@@ -267,7 +285,7 @@ def main():
                 raise ValueError(f"{a} vs {b} @ {cond}: utterance_ids differ -- cannot pair")
             truth = da["true_label"].to_numpy(int)
             n01, n10, chi2, p = mcnemar(
-                da["pred"].to_numpy(int), db["pred"].to_numpy(int), truth
+                da["score"].to_numpy(float), db["score"].to_numpy(float), truth
             )
             mrows.append(
                 {
