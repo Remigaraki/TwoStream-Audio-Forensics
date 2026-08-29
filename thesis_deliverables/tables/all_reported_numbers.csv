@@ -1,0 +1,239 @@
+metric,model,condition,comparison,value,source_file
+discordant_only_first_correct,,aac_128,A1 vs A0,230.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,aac_128,C1 vs A1,122.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,aac_128,C1 vs B0,1312.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,aac_128,C2 vs C1,19.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,clean,A1 vs A0,216.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,clean,C1 vs A1,122.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,clean,C1 vs B0,1319.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,clean,C2 vs C1,16.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_128,A1 vs A0,988.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_128,C1 vs A1,187.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_128,C1 vs B0,2175.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_128,C2 vs C1,23.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_64,A1 vs A0,966.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_64,C1 vs A1,191.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_64,C1 vs B0,2282.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,mp3_64,C2 vs C1,17.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_16,A1 vs A0,1474.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_16,C1 vs A1,353.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_16,C1 vs B0,3183.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_16,C2 vs C1,38.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_32,A1 vs A0,608.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_32,C1 vs A1,207.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_32,C1 vs B0,2023.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_32,C2 vs C1,34.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_64,A1 vs A0,218.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_64,C1 vs A1,118.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_64,C1 vs B0,1461.0,results/tables/table_mcnemar.csv
+discordant_only_first_correct,,opus_64,C2 vs C1,18.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,aac_128,A1 vs A0,115.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,aac_128,C1 vs A1,98.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,aac_128,C1 vs B0,65.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,aac_128,C2 vs C1,32.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,clean,A1 vs A0,114.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,clean,C1 vs A1,89.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,clean,C1 vs B0,65.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,clean,C2 vs C1,34.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_128,A1 vs A0,175.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_128,C1 vs A1,206.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_128,C1 vs B0,78.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_128,C2 vs C1,34.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_64,A1 vs A0,183.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_64,C1 vs A1,210.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_64,C1 vs B0,81.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,mp3_64,C2 vs C1,33.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_16,A1 vs A0,247.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_16,C1 vs A1,246.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_16,C1 vs B0,186.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_16,C2 vs C1,55.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_32,A1 vs A0,197.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_32,C1 vs A1,147.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_32,C1 vs B0,108.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_32,C2 vs C1,35.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_64,A1 vs A0,108.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_64,C1 vs A1,88.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_64,C1 vs B0,62.0,results/tables/table_mcnemar.csv
+discordant_only_second_correct,,opus_64,C2 vs C1,29.0,results/tables/table_mcnemar.csv
+eer,A0,aac_128,,0.0162457584882249,results/tables/metrics_long.csv
+eer,A0,clean,,0.0154467867592958,results/tables/metrics_long.csv
+eer,A0,mp3_128,,0.0586577494831692,results/tables/metrics_long.csv
+eer,A0,mp3_64,,0.0577033916017121,results/tables/metrics_long.csv
+eer,A0,opus_16,,0.0948333527992086,results/tables/metrics_long.csv
+eer,A0,opus_32,,0.0383061945931837,results/tables/metrics_long.csv
+eer,A0,opus_64,,0.0155577245164108,results/tables/metrics_long.csv
+eer,A1,aac_128,,0.0101203085664351,results/tables/metrics_long.csv
+eer,A1,clean,,0.0099649224139072,results/tables/metrics_long.csv
+eer,A1,mp3_128,,0.0152914006067678,results/tables/metrics_long.csv
+eer,A1,mp3_64,,0.0159794345785819,results/tables/metrics_long.csv
+eer,A1,opus_16,,0.0295175055749636,results/tables/metrics_long.csv
+eer,A1,opus_32,,0.016467634002455,results/tables/metrics_long.csv
+eer,A1,opus_64,,0.0095876607471491,results/tables/metrics_long.csv
+eer,B0,aac_128,,0.0753917073952673,results/tables/metrics_long.csv
+eer,B0,clean,,0.0750144457285091,results/tables/metrics_long.csv
+eer,B0,mp3_128,,0.1280793931091747,results/tables/metrics_long.csv
+eer,B0,mp3_64,,0.1343157807880795,results/tables/metrics_long.csv
+eer,B0,opus_16,,0.1834968072812145,results/tables/metrics_long.csv
+eer,B0,opus_32,,0.1152958454463091,results/tables/metrics_long.csv
+eer,B0,opus_64,,0.0825824529556291,results/tables/metrics_long.csv
+eer,C1,aac_128,,0.0088996267753351,results/tables/metrics_long.csv
+eer,C1,clean,,0.008100655046406,results/tables/metrics_long.csv
+eer,C1,mp3_128,,0.0162457584882249,results/tables/metrics_long.csv
+eer,C1,mp3_64,,0.0170002818217411,results/tables/metrics_long.csv
+eer,C1,opus_16,,0.0238137657153449,results/tables/metrics_long.csv
+eer,C1,opus_32,,0.0131608093296235,results/tables/metrics_long.csv
+eer,C1,opus_64,,0.0079897172892909,results/tables/metrics_long.csv
+eer,C2,aac_128,,0.0095876607471491,results/tables/metrics_long.csv
+eer,C2,clean,,0.0091659506849781,results/tables/metrics_long.csv
+eer,C2,mp3_128,,0.0168893440646261,results/tables/metrics_long.csv
+eer,C2,mp3_64,,0.0178437019460831,results/tables/metrics_long.csv
+eer,C2,opus_16,,0.024723675201389,results/tables/metrics_long.csv
+eer,C2,opus_32,,0.0133161954821516,results/tables/metrics_long.csv
+eer,C2,opus_64,,0.008633302865692,results/tables/metrics_long.csv
+eer_pct,A0,aac_128,,1.6245758488224933,results/tables/table_eer.csv
+eer_pct,A0,clean,,1.5446786759295852,results/tables/table_eer.csv
+eer_pct,A0,mp3_128,,5.865774948316921,results/tables/table_eer.csv
+eer_pct,A0,mp3_64,,5.77033916017121,results/tables/table_eer.csv
+eer_pct,A0,opus_16,,9.483335279920864,results/tables/table_eer.csv
+eer_pct,A0,opus_32,,3.8306194593183727,results/tables/table_eer.csv
+eer_pct,A0,opus_64,,1.5557724516410891,results/tables/table_eer.csv
+eer_pct,A1,aac_128,,1.0120308566435192,results/tables/table_eer.csv
+eer_pct,A1,aac_128,,1.0120308566435192,results/tables/table_c1_margin.csv
+eer_pct,A1,clean,,0.9964922413907226,results/tables/table_eer.csv
+eer_pct,A1,clean,,0.9964922413907226,results/tables/table_c1_margin.csv
+eer_pct,A1,mp3_128,,1.5291400606767886,results/tables/table_eer.csv
+eer_pct,A1,mp3_128,,1.5291400606767886,results/tables/table_c1_margin.csv
+eer_pct,A1,mp3_64,,1.5979434578581926,results/tables/table_eer.csv
+eer_pct,A1,mp3_64,,1.5979434578581926,results/tables/table_c1_margin.csv
+eer_pct,A1,opus_16,,2.951750557496363,results/tables/table_eer.csv
+eer_pct,A1,opus_16,,2.951750557496363,results/tables/table_c1_margin.csv
+eer_pct,A1,opus_32,,1.646763400245507,results/tables/table_eer.csv
+eer_pct,A1,opus_32,,1.646763400245507,results/tables/table_c1_margin.csv
+eer_pct,A1,opus_64,,0.9587660747149176,results/tables/table_eer.csv
+eer_pct,A1,opus_64,,0.9587660747149176,results/tables/table_c1_margin.csv
+eer_pct,B0,aac_128,,7.539170739526729,results/tables/table_eer.csv
+eer_pct,B0,clean,,7.501444572850918,results/tables/table_eer.csv
+eer_pct,B0,mp3_128,,12.80793931091747,results/tables/table_eer.csv
+eer_pct,B0,mp3_64,,13.431578078807949,results/tables/table_eer.csv
+eer_pct,B0,opus_16,,18.349680728121456,results/tables/table_eer.csv
+eer_pct,B0,opus_32,,11.529584544630916,results/tables/table_eer.csv
+eer_pct,B0,opus_64,,8.258245295562915,results/tables/table_eer.csv
+eer_pct,C1,aac_128,,0.8899626775335137,results/tables/table_eer.csv
+eer_pct,C1,aac_128,,0.8899626775335137,results/tables/table_c1_margin.csv
+eer_pct,C1,clean,,0.8100655046406002,results/tables/table_eer.csv
+eer_pct,C1,clean,,0.8100655046406002,results/tables/table_c1_margin.csv
+eer_pct,C1,mp3_128,,1.6245758488224933,results/tables/table_eer.csv
+eer_pct,C1,mp3_128,,1.6245758488224933,results/tables/table_c1_margin.csv
+eer_pct,C1,mp3_64,,1.700028182174114,results/tables/table_eer.csv
+eer_pct,C1,mp3_64,,1.700028182174114,results/tables/table_c1_margin.csv
+eer_pct,C1,opus_16,,2.381376571534492,results/tables/table_eer.csv
+eer_pct,C1,opus_16,,2.381376571534492,results/tables/table_c1_margin.csv
+eer_pct,C1,opus_32,,1.3160809329623595,results/tables/table_eer.csv
+eer_pct,C1,opus_32,,1.3160809329623595,results/tables/table_c1_margin.csv
+eer_pct,C1,opus_64,,0.7989717289290963,results/tables/table_eer.csv
+eer_pct,C1,opus_64,,0.7989717289290963,results/tables/table_c1_margin.csv
+eer_pct,C2,aac_128,,0.9587660747149176,results/tables/table_eer.csv
+eer_pct,C2,clean,,0.9165950684978146,results/tables/table_eer.csv
+eer_pct,C2,mp3_128,,1.68893440646261,results/tables/table_eer.csv
+eer_pct,C2,mp3_64,,1.7843701946083146,results/tables/table_eer.csv
+eer_pct,C2,opus_16,,2.472367520138904,results/tables/table_eer.csv
+eer_pct,C2,opus_32,,1.3316195482151625,results/tables/table_eer.csv
+eer_pct,C2,opus_64,,0.8633302865692074,results/tables/table_eer.csv
+min_dcf,A0,aac_128,,0.0403033354737914,results/tables/metrics_long.csv
+min_dcf,A0,aac_128,,0.0403033354737914,results/tables/table_min_dcf.csv
+min_dcf,A0,clean,,0.0395313259523778,results/tables/metrics_long.csv
+min_dcf,A0,clean,,0.0395313259523778,results/tables/table_min_dcf.csv
+min_dcf,A0,mp3_128,,0.1612935511525373,results/tables/metrics_long.csv
+min_dcf,A0,mp3_128,,0.1612935511525373,results/tables/table_min_dcf.csv
+min_dcf,A0,mp3_64,,0.1593003361528117,results/tables/metrics_long.csv
+min_dcf,A0,mp3_64,,0.1593003361528117,results/tables/table_min_dcf.csv
+min_dcf,A0,opus_16,,0.2262762635638533,results/tables/metrics_long.csv
+min_dcf,A0,opus_16,,0.2262762635638533,results/tables/table_min_dcf.csv
+min_dcf,A0,opus_32,,0.0921632537549436,results/tables/metrics_long.csv
+min_dcf,A0,opus_32,,0.0921632537549436,results/tables/table_min_dcf.csv
+min_dcf,A0,opus_64,,0.0397324691272793,results/tables/metrics_long.csv
+min_dcf,A0,opus_64,,0.0397324691272793,results/tables/table_min_dcf.csv
+min_dcf,A1,aac_128,,0.0265757440850534,results/tables/metrics_long.csv
+min_dcf,A1,aac_128,,0.0265757440850534,results/tables/table_min_dcf.csv
+min_dcf,A1,clean,,0.0267535376667051,results/tables/metrics_long.csv
+min_dcf,A1,clean,,0.0267535376667051,results/tables/table_min_dcf.csv
+min_dcf,A1,mp3_128,,0.0395406447476181,results/tables/metrics_long.csv
+min_dcf,A1,mp3_128,,0.0395406447476181,results/tables/table_min_dcf.csv
+min_dcf,A1,mp3_64,,0.0428907664132793,results/tables/metrics_long.csv
+min_dcf,A1,mp3_64,,0.0428907664132793,results/tables/table_min_dcf.csv
+min_dcf,A1,opus_16,,0.0764425525767774,results/tables/metrics_long.csv
+min_dcf,A1,opus_16,,0.0764425525767774,results/tables/table_min_dcf.csv
+min_dcf,A1,opus_32,,0.0416976225309862,results/tables/metrics_long.csv
+min_dcf,A1,opus_32,,0.0416976225309862,results/tables/table_min_dcf.csv
+min_dcf,A1,opus_64,,0.0256071981812095,results/tables/metrics_long.csv
+min_dcf,A1,opus_64,,0.0256071981812095,results/tables/table_min_dcf.csv
+min_dcf,B0,aac_128,,0.1585319865311905,results/tables/metrics_long.csv
+min_dcf,B0,aac_128,,0.1585319865311905,results/tables/table_min_dcf.csv
+min_dcf,B0,clean,,0.1555235264411209,results/tables/metrics_long.csv
+min_dcf,B0,clean,,0.1555235264411209,results/tables/table_min_dcf.csv
+min_dcf,B0,mp3_128,,0.3293746642727581,results/tables/metrics_long.csv
+min_dcf,B0,mp3_128,,0.3293746642727581,results/tables/table_min_dcf.csv
+min_dcf,B0,mp3_64,,0.3500175677554317,results/tables/metrics_long.csv
+min_dcf,B0,mp3_64,,0.3500175677554317,results/tables/table_min_dcf.csv
+min_dcf,B0,opus_16,,0.4867981125509028,results/tables/metrics_long.csv
+min_dcf,B0,opus_16,,0.4867981125509028,results/tables/table_min_dcf.csv
+min_dcf,B0,opus_32,,0.2826754718622744,results/tables/metrics_long.csv
+min_dcf,B0,opus_32,,0.2826754718622744,results/tables/table_min_dcf.csv
+min_dcf,B0,opus_64,,0.1801388291252366,results/tables/metrics_long.csv
+min_dcf,B0,opus_64,,0.1801388291252366,results/tables/table_min_dcf.csv
+min_dcf,C1,aac_128,,0.0199364411588359,results/tables/metrics_long.csv
+min_dcf,C1,aac_128,,0.0199364411588359,results/tables/table_min_dcf.csv
+min_dcf,C1,clean,,0.0191223392433937,results/tables/metrics_long.csv
+min_dcf,C1,clean,,0.0191223392433937,results/tables/table_min_dcf.csv
+min_dcf,C1,mp3_128,,0.0412157581855976,results/tables/metrics_long.csv
+min_dcf,C1,mp3_128,,0.0412157581855976,results/tables/table_min_dcf.csv
+min_dcf,C1,mp3_64,,0.0428486740192507,results/tables/metrics_long.csv
+min_dcf,C1,mp3_64,,0.0428486740192507,results/tables/table_min_dcf.csv
+min_dcf,C1,opus_16,,0.0617368860683597,results/tables/metrics_long.csv
+min_dcf,C1,opus_16,,0.0617368860683597,results/tables/table_min_dcf.csv
+min_dcf,C1,opus_32,,0.0325786334671829,results/tables/metrics_long.csv
+min_dcf,C1,opus_32,,0.0325786334671829,results/tables/table_min_dcf.csv
+min_dcf,C1,opus_64,,0.0201189467432566,results/tables/metrics_long.csv
+min_dcf,C1,opus_64,,0.0201189467432566,results/tables/table_min_dcf.csv
+min_dcf,C2,aac_128,,0.0217331197761314,results/tables/metrics_long.csv
+min_dcf,C2,aac_128,,0.0217331197761314,results/tables/table_min_dcf.csv
+min_dcf,C2,clean,,0.0208862442619013,results/tables/metrics_long.csv
+min_dcf,C2,clean,,0.0208862442619013,results/tables/table_min_dcf.csv
+min_dcf,C2,mp3_128,,0.0428533860220199,results/tables/metrics_long.csv
+min_dcf,C2,mp3_128,,0.0428533860220199,results/tables/table_min_dcf.csv
+min_dcf,C2,mp3_64,,0.04546406134446,results/tables/metrics_long.csv
+min_dcf,C2,mp3_64,,0.04546406134446,results/tables/table_min_dcf.csv
+min_dcf,C2,opus_16,,0.062859981170903,results/tables/metrics_long.csv
+min_dcf,C2,opus_16,,0.062859981170903,results/tables/table_min_dcf.csv
+min_dcf,C2,opus_32,,0.0346513212521963,results/tables/metrics_long.csv
+min_dcf,C2,opus_32,,0.0346513212521963,results/tables/table_min_dcf.csv
+min_dcf,C2,opus_64,,0.0206476154854427,results/tables/metrics_long.csv
+min_dcf,C2,opus_64,,0.0206476154854427,results/tables/table_min_dcf.csv
+p_value,,aac_128,A1 vs A0,8.38019098559073e-10,results/tables/table_mcnemar.csv
+p_value,,aac_128,C1 vs A1,0.1209832609830985,results/tables/table_mcnemar.csv
+p_value,,aac_128,C1 vs B0,0.0,results/tables/table_mcnemar.csv
+p_value,,aac_128,C2 vs C1,0.0928919408837047,results/tables/table_mcnemar.csv
+p_value,,clean,A1 vs A0,2.6998028812563746e-08,results/tables/table_mcnemar.csv
+p_value,,clean,C1 vs A1,0.0275968032180202,results/tables/table_mcnemar.csv
+p_value,,clean,C1 vs B0,0.0,results/tables/table_mcnemar.csv
+p_value,,clean,C2 vs C1,0.0162095414092253,results/tables/table_mcnemar.csv
+p_value,,mp3_128,A1 vs A0,0.0,results/tables/table_mcnemar.csv
+p_value,,mp3_128,C1 vs A1,0.3638888465043808,results/tables/table_mcnemar.csv
+p_value,,mp3_128,C1 vs B0,0.0,results/tables/table_mcnemar.csv
+p_value,,mp3_128,C2 vs C1,0.1853263041985793,results/tables/table_mcnemar.csv
+p_value,,mp3_64,A1 vs A0,0.0,results/tables/table_mcnemar.csv
+p_value,,mp3_64,C1 vs A1,0.3687181242228241,results/tables/table_mcnemar.csv
+p_value,,mp3_64,C1 vs B0,0.0,results/tables/table_mcnemar.csv
+p_value,,mp3_64,C2 vs C1,0.0338948535246892,results/tables/table_mcnemar.csv
+p_value,,opus_16,A1 vs A0,0.0,results/tables/table_mcnemar.csv
+p_value,,opus_16,C1 vs A1,1.4840497302381904e-05,results/tables/table_mcnemar.csv
+p_value,,opus_16,C1 vs B0,0.0,results/tables/table_mcnemar.csv
+p_value,,opus_16,C2 vs C1,0.0970910675964766,results/tables/table_mcnemar.csv
+p_value,,opus_32,A1 vs A0,0.0,results/tables/table_mcnemar.csv
+p_value,,opus_32,C1 vs A1,0.0017137749524662,results/tables/table_mcnemar.csv
+p_value,,opus_32,C1 vs B0,0.0,results/tables/table_mcnemar.csv
+p_value,,opus_32,C2 vs C1,1.0,results/tables/table_mcnemar.csv
+p_value,,opus_64,A1 vs A0,1.5705274858390792e-09,results/tables/table_mcnemar.csv
+p_value,,opus_64,C1 vs A1,0.0433288828213009,results/tables/table_mcnemar.csv
+p_value,,opus_64,C1 vs B0,0.0,results/tables/table_mcnemar.csv
+p_value,,opus_64,C2 vs C1,0.1446614877728049,results/tables/table_mcnemar.csv
