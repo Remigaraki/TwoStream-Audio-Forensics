@@ -131,7 +131,9 @@ def about_tab() -> None:
     st.markdown(f"""
 ### Models served
 - **C1 (default)** - two-stream fusion: RawNet2 on the raw waveform + a statistical stream
-  (LFCC and PCA-compressed bispectrum) combined by cross-modal attention.
+  (LFCC and PCA-compressed bispectrum) combined by cross-modal attention. Its K=128 PCA was
+  fitted on synthetic noise waveforms, not speech; it is a fixed projection used identically in
+  training, evaluation and this demo.
   Checkpoint `{inf.MODELS['C1']['checkpoint'][0]}`, PCA `{inf.MODELS['C1']['pca'][0]}`.
 - **A1 (optional comparison)** - RawNet2 only, trained with codec augmentation.
   Checkpoint `{inf.MODELS['A1']['checkpoint'][0]}`.
@@ -144,6 +146,18 @@ Validation EER logged in the checkpoints: C1 0.86%, A1 1.05%.
     st.markdown(table.read_text(encoding="utf-8").split("\n", 2)[-1] if table.exists()
                 else "_Table not bundled with this build._")
     st.markdown("""
+### Research-only models (results shown, not available for analysis)
+Some rows in the table are experiments reported for comparison. They cannot be run on
+uploads here, and they are not combined with C1 or A1.
+- **B0** - statistical stream only (LFCC + bispectrum, K=128 PCA), no RawNet2.
+- **B1** - statistical stream only, with a smaller K=64 PCA fitted on synthetic noise
+  waveforms. Similar to B0 on clean audio but more robust to MP3 compression; about 9 times
+  more errors than C1 on clean audio.
+- **C0** - an earlier checkpoint (epoch 12) of a fusion model with the same design as C1,
+  trained end to end. C1, trained separately, does much better in every condition.
+- **A0** and **C2** - RawNet2 without codec augmentation, and fusion without the attention
+  head (plain concatenation).
+
 ### Scope of these numbers
 - Data: a held-out test split (18,769 utterances) drawn from the ASVspoof 5 **train and dev**
   partitions by `scripts/build_manifest.py`. It is an utterance-level random split: speakers and
