@@ -1,0 +1,64 @@
+[init] device=cuda
+[init] test set: 18769 utterances
+[init] building model (setup=B, fusion=None) …
+[init] loaded checkpoint /kaggle/working/checkpoints/B1/best.pt (epoch=9, val_eer=0.0604)
+  [predict] batch 0/587
+  [predict] batch 100/587
+  [predict] batch 200/587
+  [predict] batch 300/587
+  [predict] batch 400/587
+  [predict] batch 500/587
+
+[eval] test EER (src.eval.metrics, train.py's implementation) : 0.0867
+[eval] test EER (src.utils.metrics, mcnemar_test.py's implementation): 0.0868
+[eval] EER threshold used for pred (src.utils.metrics): 0.221565
+
+[done] wrote 18769 predictions to results/preds_B1_opus_64.csv (bonafide=7520, spoof=11249)
+[init] device=cuda
+[init] test set: 18769 utterances
+[init] building model (setup=B, fusion=None) …
+[init] loaded checkpoint /kaggle/working/checkpoints/B1/best.pt (epoch=9, val_eer=0.0604)
+  [predict] batch 0/587
+  [predict] batch 100/587
+  [predict] batch 200/587
+  [predict] batch 300/587
+  [predict] batch 400/587
+  [predict] batch 500/587
+
+[eval] test EER (src.eval.metrics, train.py's implementation) : 0.1059
+[eval] test EER (src.utils.metrics, mcnemar_test.py's implementation): 0.1059
+[eval] EER threshold used for pred (src.utils.metrics): 0.687174
+
+[done] wrote 18769 predictions to results/preds_B1_mp3_64.csv (bonafide=7520, spoof=11249)
+[init] device=cuda
+[init] test set: 18769 utterances
+[init] building model (setup=B, fusion=None) …
+[init] loaded checkpoint /kaggle/working/checkpoints/B1/best.pt (epoch=9, val_eer=0.0604)
+  [predict] batch 0/587
+  [predict] batch 100/587
+  [predict] batch 200/587
+  [predict] batch 300/587
+  [predict] batch 400/587
+  [predict] batch 500/587
+
+[eval] test EER (src.eval.metrics, train.py's implementation) : 0.1014
+[eval] test EER (src.utils.metrics, mcnemar_test.py's implementation): 0.1014
+[eval] EER threshold used for pred (src.utils.metrics): 0.701145
+
+[done] wrote 18769 predictions to results/preds_B1_mp3_128.csv (bonafide=7520, spoof=11249)
+[init] device=cuda
+[init] test set: 18769 utterances
+[init] building model (setup=B, fusion=None) …
+[init] loaded checkpoint /kaggle/working/checkpoints/B1/best.pt (epoch=9, val_eer=0.0604)
+  [predict] batch 0/587
+  [predict] batch 100/587
+  [predict] batch 200/587
+  [predict] batch 300/587
+  [predict] batch 400/587
+  [predict] batch 500/587
+
+[eval] test EER (src.eval.metrics, train.py's implementation) : 0.0787
+[eval] test EER (src.utils.metrics, mcnemar_test.py's implementation): 0.0787
+[eval] EER threshold used for pred (src.utils.metrics): 0.245470
+
+[done] wrote 18769 predictions to results/preds_B1_aac_128.csv (bonafide=7520, spoof=11249)

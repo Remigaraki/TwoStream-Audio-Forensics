@@ -25,10 +25,10 @@ script whose name sounds plausible but isn't listed under "Usage" below.
 
 | Branch | Status | Contents |
 |---|---|---|
-| `main` | **canonical** | All source code, final checkpoints (A0/A1/B0/B1/C1/C2), all prediction CSVs, result tables/figures, eval scripts, this README |
+| `main` | **canonical** | All source code, final checkpoints (A0/A1/B0/C1/C2), all prediction CSVs, result tables/figures, eval scripts, this README. Also carries the B1 (PCA K=64, synthetic-fit) ablation and C0 (epoch-12 end-to-end fusion) results — see the checkpoint reference — and a real-data K=64 PCA (`pca_k64.pkl`) that no reported result uses. |
 | `eval-workspace` | historical / working | Where the results-assembly work happened before being folded into `main`. No longer diverges from `main` — kept for reference, not actively developed. |
 | `run-a1` | historical | A1 training trajectory (intermediate checkpoints not carried into `main`) |
-| `run-b1-k64` | historical | B1 (PCA K=64 ablation) training trajectory; final checkpoint + PCA model merged into `main` |
+| `run-b1-k64` | historical | Fitted `pca_k64.pkl` (K=64, real-data fit). Only the PCA file merged into `main`. It is **not** the PCA the reported B1 used; see "Deprecated / do-not-use" below. |
 | `run-c1` | historical | C1 (attention fusion) training trajectory (intermediate checkpoints not carried into `main`) |
 | `run-c2` | historical | C2 (concat fusion) training trajectory (intermediate checkpoints not carried into `main`) |
 | `results-mp3-64`, `results-mp3-128` | historical | Superseded — their prediction CSVs are byte-identical to what's already on `main` under normalized filenames |
@@ -39,12 +39,13 @@ Don't develop against `eval-workspace` or the `run-*` branches going forward —
 
 ## ⚠️ Deprecated / do-not-use
 
-Two files in this repo look like the right entry point and are not. Both belong to an earlier, abandoned pipeline and were superseded before any thesis result was produced. They're kept in the repo for history, not for use.
+Three files in this repo look like something they're not. The first two belong to an earlier, abandoned pipeline, superseded before any thesis result was produced; the third is an orphaned artifact with no corresponding claim anywhere in the manuscript. All three are kept in the repo for history, not for use.
 
 | File | Looks like | Actually is |
 |---|---|---|
 | `data/torture_pipeline.py` | The codec-degradation pipeline | Disconnected from both training and evaluation. `train.py` never imports it. The real path is `src/pipeline/augment.py` (`transcode()` / `CODEC_CONDITIONS`), used by A1's `--augment codec` and by `scripts/make_codec_testsets.py`. |
 | `scripts/preprocess_datasets.py` | The manifest builder | A different, earlier pipeline. It enumerates files via `os.walk()` (order not guaranteed across filesystems/OSes), includes WaveFake, emits a schema with no `utterance_id` column, and reassigns train/val/test splits by *positional index* after that unordered walk — so even with identical source audio, two runs can produce different splits. It cannot reproduce the evaluated manifest and its hash will never match `ed4808bb0456de26`. The real builder is `scripts/build_manifest.py`, below. |
+| `data/pca_model/pca_k64.pkl` | The PCA behind the reported B1 | A **different** K=64 PCA, fitted on 2000 real samples (99.7% explained variance; sklearn 1.6.1). Committed 2026-07-15. The reported B1 used `pca_k64_synthetic.pkl` instead (SHA-256 recorded in `results/provenance/B1/run_metadata.json`); the two files differ in content, not just bytes. No prediction CSV, metric or log in this repo is tied to `pca_k64.pkl` (the planned "B1r" row in `build_results.py` has no CSVs). Note: `checkpoints/setup_b/best_b_ep3_eer0750_0713_0222.pt` **is** a K=64 model (Stream 2 MLP input 184 = 120 + 64), so an earlier claim that no setup_b checkpoint can be K=64 was wrong; which K=64 PCA that checkpoint was trained with is not recorded. |
 
 If you're regenerating anything for the thesis, the only scripts you want are the ones named explicitly in "Usage."
 
@@ -56,8 +57,9 @@ If you're regenerating anything for the thesis, the only scripts you want are th
 |---|---|---|---|---|
 | A0 | `checkpoints/setup_a/best_a0_final_eer0156.pt` | 1.56% | 1.54% | RawNet2, no augmentation |
 | A1 | `checkpoints/setup_a/best_a_ep13_eer0105_0713_0401.pt` | 1.05% | 1.00% | RawNet2, trained with `--augment codec` — see `docs/a1_training_log.md` for the exact command |
-| B0 | `checkpoints/setup_b/best_b_ep4_eer0759_0624_1407.pt` | 7.59% | 7.50% | Statistical stream only, PCA K=128 (`data/pca_model/pca.pkl`) |
-| B1 | `checkpoints/setup_b/best_b_ep3_eer0750_0713_0222.pt` | 7.50% | *not yet generated* | Statistical stream, PCA **K=64** ablation (`data/pca_model/pca_k64.pkl`). **No `preds_B1_*.csv` files exist yet for any condition — see "What could not be recovered" before citing B1 test-set numbers.** |
+| B0 | `checkpoints/setup_b/best_b_ep4_eer0759_0624_1407.pt` | 7.59% | 7.50% | Statistical stream only, PCA K=128 (`data/pca_model/pca.pkl`, a synthetic-noise fit — see "What could not be recovered" item 3) |
+| B1 | `checkpoints/setup_b/best_b1_k64synthetic_ep9_eer0604.pt` | 6.04% | 7.58% | Statistical stream only, PCA **K=64 synthetic fit** (`data/pca_model/pca_k64_synthetic.pkl`, identical to `scripts/fit_pca.py --synthetic --n_components 64`). 10 epochs, lr 1e-4, batch 32, seed 42, no augmentation. Checkpoint is git-ignored locally like the others; force-add via LFS to publish. Provenance: `results/provenance/B1/` |
+| C0 | `checkpoints/setup_c/best_c_ep12_eer0566_0710_0112.pt` | 5.66% | 6.76% | Fusion, attention head, epoch 12 of the `best_c_ep*` run. Both streams change across that run's checkpoints (not frozen); its streams differ from C1/C2's and from A0/A1/B0. Exact training command not recorded. Provenance: `results/provenance/C0/` |
 | C1 | `checkpoints/setup_c/best_c1_attention.pt` | 0.86% | 0.81% | Fusion, cross-modal attention head |
 | C2 | `checkpoints/setup_c/best_c2_concat.pt` | 0.94% | 0.92% | Fusion, plain concat head (no attention) |
 
@@ -146,6 +148,8 @@ Cross-check its output before trusting it: `table_eer.md`'s clean-condition C1 r
 Documented explicitly rather than silently assumed:
 
 1. **The exact C1/C2 training invocation.** No committed log, notebook cell, or script names the `--augment`/`--freeze_streams`/`--init_stream1_from`/`--init_stream2_from`/`--fusion` values actually used. `src/train.py` defines the mechanism (frozen-stream fusion-head training is *possible*), and the checkpoints confirm Stream A in both C1 and C2 is neither A1's literal weights nor random-scratch init — but the specific source checkpoint it was frozen from is not identifiable from anything in this repo. Unlike A1 (`docs/a1_training_log.md`, recovered from a groupmate's notebook output) or the manifest (`scripts/build_manifest.py`, recovered from the Phase 0 notebook cell), no equivalent record for C1/C2 ever existed to recover.
-2. **B1's (PCA K=64) test-set predictions.** The trained checkpoint and fitted PCA exist and are committed, but no `preds_B1_*.csv` was ever generated for any condition, clean included. If the thesis cites B1 test-set numbers, they need to be produced with `predict_testset.py` before submission — the val EER (7.50%, from the checkpoint's own metadata) is the only B1 number currently backed by a committed artifact.
+2. **B1 and C0 training logs.** Both were evaluated on Kaggle at commit `ef1e92f` against manifest `ed4808bb0456de26` (full 18,769-utterance test split, all 7 conditions). The supplied `evaluation.log` files are partial (C0: 3 of 7 conditions, B1: 4 of 7); every EER they do print matches the committed CSVs exactly. B1's hyper-parameters come from its `run_metadata.json`; no training log exists for either. C0 was evaluated with scikit-learn 1.6.1 unpickling a 1.8.0 PCA (warning in its log); the PCA transform is linear and the C0 numbers are internally consistent, but that version mismatch is recorded here.
+3. **The K=128 PCA (`pca.pkl`) is a synthetic-noise fit.** Re-running `scripts/fit_pca.py --synthetic` (500 Gaussian-noise waveforms, seed 42, K=128) with the code from the commit that added `pca.pkl` (`eed15b5`) reproduces it exactly (identical mean, components within 7e-5, same 40.71% explained variance). B0, C0, C1, C2 and the demo therefore project the bispectrum with a PCA fitted on noise, not speech. Results stay internally valid (the projection is fixed and identical at training and test time), but methods text describing a PCA "fitted on training audio" would be inaccurate.
+4. **The bispectrum feature changed after `pca.pkl` was fitted.** Commit `4385aac` ("vectorize bispectrum inner loop") switched to `np.tril_indices`, so `estimate_bispectrum` now fills only the j ≤ i half of the valid region (the other symmetric half is zero); the earlier loop filled all i + j < 128. All checkpoints post-date that commit, so training, evaluation and the demo consistently use the current feature, but `pca.pkl` was fitted on the older full-region features and cannot be regenerated with current code.
 
-Everything else — the manifest builder and its hash verification, training code, both eval scripts, all five other checkpoints' provenance, all 35 clean+codec prediction CSVs, and every result table — is committed, checked, and reproducible from `main` alone.
+Everything else — the manifest builder and its hash verification, training code, both eval scripts, the other checkpoints' provenance, all 49 clean+codec prediction CSVs, and every result table — is in this repo, checked, and reproducible from it alone (the B1/C0 files are not committed yet).

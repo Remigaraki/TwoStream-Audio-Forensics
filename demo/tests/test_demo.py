@@ -185,6 +185,7 @@ def test_app_renders_without_upload(monkeypatch):
     at = _run_app(monkeypatch, None)
     text = " ".join(m.value for m in at.markdown)
     assert "Reported test EER" in text and "not** held out" in text
+    assert "Research-only models" in text and "**B1**" in text and "**C0**" in text
     assert any("experimental research model" in i.value for i in at.info)
 
 

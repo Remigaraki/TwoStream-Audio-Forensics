@@ -1,0 +1,13 @@
+{
+  "model": "C0",
+  "checkpoint": "checkpoints/setup_c/best_c_ep12_eer0566_0710_0112.pt",
+  "checkpoint_epoch": 12,
+  "checkpoint_val_eer": 0.056640613177567266,
+  "checkpoint_sha256": "72c77ef9c79d972a1fb3d4a993b854b5811f21d9b061df0dbba34142c1dd4fdf",
+  "pca_path": "data/pca_model/pca.pkl",
+  "pca_sha256": "224766ac0d971c36439d2b1c3b7d6ede5c16d7e9567762fd738710dc11978c31",
+  "code_sha": "ef1e92faf82dbb1ac0c2294c0121697b1dd13c12",
+  "manifest_hash": "ed4808bb0456de26",
+  "setup": "C",
+  "fusion": "attention"
+}

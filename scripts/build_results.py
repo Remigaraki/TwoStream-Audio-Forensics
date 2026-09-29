@@ -28,7 +28,8 @@ from mcnemar_test import mcnemar_test as _mcnemar_stat, _binarise_at_eer
 
 # ---------------------------------------------------------------- config
 
-MODELS = ["A0", "A1", "B0", "C1", "C2"]
+# Models with no prediction CSVs yet are skipped (see `models` in main()).
+MODELS = ["A0", "A1", "B0", "B1", "B1r", "C0", "C1", "C2"]
 CONDITIONS = ["clean", "opus_16", "opus_32", "opus_64", "mp3_64", "mp3_128", "aac_128"]
 
 # Pretty names for the thesis tables
@@ -36,6 +37,9 @@ MODEL_LABELS = {
     "A0": "A0 (RawNet2, no aug.)",
     "A1": "A1 (RawNet2 + codec aug.)",
     "B0": "B0 (statistical stream)",
+    "B1": "B1 (statistical stream, PCA K=64, synthetic fit)",
+    "B1r": "B1r (statistical stream, PCA K=64, real-data fit)",
+    "C0": "C0 (fusion, attention, end-to-end, epoch 12)",
     "C1": "C1 (fusion, attention)",
     "C2": "C2 (fusion, concat)",
 }
@@ -53,11 +57,14 @@ CONDITION_LABELS = {
 # (grayscale print, colourblind readers) -- colour is kept only as a
 # secondary cue. Shared with scripts/build_deliverables.py so the minDCF
 # figure there stays visually consistent with these.
-MODEL_MARKERS = {"A0": "o", "A1": "s", "B0": "^", "C1": "D", "C2": "v"}
+MODEL_MARKERS = {"A0": "o", "A1": "s", "B0": "^", "B1": "P", "B1r": "X", "C0": "*", "C1": "D", "C2": "v"}
 MODEL_LINESTYLES = {
     "A0": "solid",
     "A1": "dashed",
     "B0": "dashdot",
+    "B1": (0, (5, 1)),  # densely dashed
+    "B1r": (0, (1, 1)),  # densely dotted
+    "C0": (0, (3, 5, 1, 5)),  # loosely dash-dotted
     "C1": "dotted",
     "C2": (0, (3, 1, 1, 1, 1, 1)),  # dense dash-dot-dot -- 5th style distinct from the 4 named ones
 }
@@ -68,7 +75,10 @@ PI_SPOOF = 0.05
 C_MISS = 1.0
 C_FA = 10.0
 
-MCNEMAR_PAIRS = [("C1", "A1"), ("C1", "B0"), ("C2", "C1"), ("A1", "A0")]
+MCNEMAR_PAIRS = [
+    ("C1", "A1"), ("C1", "B0"), ("C2", "C1"), ("A1", "A0"),
+    ("B1", "B0"), ("B1r", "B0"), ("C1", "C0"),
+]
 
 # ---------------------------------------------------------------- metrics
 
@@ -228,6 +238,8 @@ def main():
     if metrics.empty:
         raise SystemExit("No prediction CSVs found -- check --results-dir")
     metrics.to_csv(os.path.join(tdir, "metrics_long.csv"), index=False)
+    # Only models with at least one CSV get table rows / legend entries.
+    models = [m for m in MODELS if m in set(metrics["model"])]
 
     print(f"\nloaded {len(metrics)} of {len(MODELS)*len(CONDITIONS)} model/condition runs")
     if missing:
@@ -240,7 +252,7 @@ def main():
         ("cllr", 1.0, "{:.3f}"),
     ]:
         wide = metrics.pivot(index="model", columns="condition", values=metric)
-        wide = wide.reindex(index=MODELS, columns=CONDITIONS) * scale
+        wide = wide.reindex(index=models, columns=CONDITIONS) * scale
         wide.index = [MODEL_LABELS[m] for m in wide.index]
         wide.columns = [CONDITION_LABELS[c] for c in wide.columns]
         wide.to_csv(os.path.join(tdir, f"table_{metric}.csv"))
@@ -252,7 +264,7 @@ def main():
 
     # ---- 3. degradation relative to clean ----------------------------
     eer_wide = metrics.pivot(index="model", columns="condition", values="eer").reindex(
-        index=MODELS, columns=CONDITIONS
+        index=models, columns=CONDITIONS
     )
     if "clean" in eer_wide.columns and eer_wide["clean"].notna().any():
         deg = eer_wide.div(eer_wide["clean"], axis=0)
@@ -289,7 +301,7 @@ def main():
     # ---- 5. McNemar across every condition ---------------------------
     mrows = []
     for cond in CONDITIONS:
-        loaded = {m: load(args.results_dir, m, cond) for m in MODELS}
+        loaded = {m: load(args.results_dir, m, cond) for m in models}
         for a, b in MCNEMAR_PAIRS:
             da, db = loaded.get(a), loaded.get(b)
             if da is None or db is None:
@@ -337,7 +349,7 @@ def main():
         ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1.0), borderaxespad=0.0)
 
     fig, ax = plt.subplots(figsize=(10.5, 5.5))
-    for m in MODELS:
+    for m in models:
         if m not in eer_wide.index:
             continue
         vals = [eer_wide.loc[m, c] * 100 if pd.notna(eer_wide.loc[m, c]) else np.nan for c in present]

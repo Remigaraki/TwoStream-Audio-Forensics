@@ -1,0 +1,50 @@
+{
+  "source_archive": "B1_artifacts (3).zip",
+  "source_archive_sha256": "cd1baeba6dadee802aaad00720751fba65d1311e1ea46104f259ea259dfc7b35",
+  "files": {
+    "preds_B1_clean.csv": {
+      "sha256": "16d149aed02b57bd64526beefe9c6bcb1bde95b8c804cc400c8db45f07a95e74",
+      "stored_as": "results/preds_B1_clean.csv"
+    },
+    "preds_B1_opus_16.csv": {
+      "sha256": "c18f73a530ee6e56ea419f9b7cf5f7369cba9524ad9f0316c84901b40e635c0a",
+      "stored_as": "results/preds_B1_opus_16.csv"
+    },
+    "preds_B1_opus_32.csv": {
+      "sha256": "73ca6fa4aed7403b568f22ba755f3cf914dc923065420ec8fed249f6f4b47a9b",
+      "stored_as": "results/preds_B1_opus_32.csv"
+    },
+    "preds_B1_opus_64.csv": {
+      "sha256": "6ed0f44e5e7feb62ef3861d18746048ae36b5e1ed8bca9c050f40f96ac4e15f9",
+      "stored_as": "results/preds_B1_opus_64.csv"
+    },
+    "preds_B1_mp3_64.csv": {
+      "sha256": "ab08895c946cd03372b260ecede0daee4aa1d5b0d121d4695b909d75214c39c6",
+      "stored_as": "results/preds_B1_mp3_64.csv"
+    },
+    "preds_B1_mp3_128.csv": {
+      "sha256": "0fb8573ab8de924ffc742c2c4afbf5745aa04662a2dd11b807a3d1d399229781",
+      "stored_as": "results/preds_B1_mp3_128.csv"
+    },
+    "preds_B1_aac_128.csv": {
+      "sha256": "05153802bc2d19c4af655d2762ff48081acba90989edcce9a0849e1e92416890",
+      "stored_as": "results/preds_B1_aac_128.csv"
+    },
+    "best.pt": {
+      "sha256": "75ca78fcad22085789d0d9e36cef0007d96fa38db7a1def7c2b344e474867437",
+      "stored_as": "checkpoints/setup_b/best_b1_k64synthetic_ep9_eer0604.pt"
+    },
+    "pca_k64_synthetic.pkl": {
+      "sha256": "a7212d003eb03abfcadc46b9270883f3ef929fea2da27d1953bdc24c546299e1",
+      "stored_as": "data/pca_model/pca_k64_synthetic.pkl"
+    },
+    "run_metadata.json": {
+      "sha256": "c9020c89acc88f73947025f48fa4bfa94184f09c5a9da9ce01c307d682278725",
+      "stored_as": "results/provenance/B1/run_metadata.json"
+    },
+    "evaluation.log": {
+      "sha256": "c5725129b83055f6bb159089fd5ff5a4a4d937cd3acb78e9a23fab850fca5985",
+      "stored_as": "results/provenance/B1/evaluation_log.txt"
+    }
+  }
+}

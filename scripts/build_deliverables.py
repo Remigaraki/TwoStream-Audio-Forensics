@@ -226,7 +226,7 @@ def build_mindcf_figure(src_tables: Path, dst_dir: Path) -> None:
 
     metrics = pd.read_csv(src_tables / "metrics_long.csv")
     mindcf_wide = metrics.pivot(index="model", columns="condition", values="min_dcf").reindex(
-        index=MODELS, columns=CONDITIONS
+        index=[m for m in MODELS if m in set(metrics["model"])], columns=CONDITIONS
     )
     present = [c for c in CONDITIONS if c in mindcf_wide.columns and mindcf_wide[c].notna().any()]
 

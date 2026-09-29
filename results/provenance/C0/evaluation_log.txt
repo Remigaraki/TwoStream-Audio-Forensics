@@ -1,0 +1,57 @@
+[init] device=cuda
+[init] test set: 18769 utterances
+[init] building model (setup=C, fusion=attention) …
+/usr/local/lib/python3.12/dist-packages/sklearn/base.py:380: InconsistentVersionWarning: Trying to unpickle estimator PCA from version 1.8.0 when using version 1.6.1. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+[init] loaded checkpoint checkpoints/setup_c/best_c_ep12_eer0566_0710_0112.pt (epoch=12, val_eer=0.0566)
+  [predict] batch 0/587
+  [predict] batch 100/587
+  [predict] batch 200/587
+  [predict] batch 300/587
+  [predict] batch 400/587
+  [predict] batch 500/587
+
+[eval] test EER (src.eval.metrics, train.py's implementation) : 0.0953
+[eval] test EER (src.utils.metrics, mcnemar_test.py's implementation): 0.0953
+[eval] EER threshold used for pred (src.utils.metrics): 0.947173
+
+[done] wrote 18769 predictions to results/preds_C0_mp3_64.csv (bonafide=7520, spoof=11249)
+[init] device=cuda
+[init] test set: 18769 utterances
+[init] building model (setup=C, fusion=attention) …
+/usr/local/lib/python3.12/dist-packages/sklearn/base.py:380: InconsistentVersionWarning: Trying to unpickle estimator PCA from version 1.8.0 when using version 1.6.1. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+[init] loaded checkpoint checkpoints/setup_c/best_c_ep12_eer0566_0710_0112.pt (epoch=12, val_eer=0.0566)
+  [predict] batch 0/587
+  [predict] batch 100/587
+  [predict] batch 200/587
+  [predict] batch 300/587
+  [predict] batch 400/587
+  [predict] batch 500/587
+
+[eval] test EER (src.eval.metrics, train.py's implementation) : 0.0909
+[eval] test EER (src.utils.metrics, mcnemar_test.py's implementation): 0.0910
+[eval] EER threshold used for pred (src.utils.metrics): 0.945337
+
+[done] wrote 18769 predictions to results/preds_C0_mp3_128.csv (bonafide=7520, spoof=11249)
+[init] device=cuda
+[init] test set: 18769 utterances
+[init] building model (setup=C, fusion=attention) …
+/usr/local/lib/python3.12/dist-packages/sklearn/base.py:380: InconsistentVersionWarning: Trying to unpickle estimator PCA from version 1.8.0 when using version 1.6.1. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+[init] loaded checkpoint checkpoints/setup_c/best_c_ep12_eer0566_0710_0112.pt (epoch=12, val_eer=0.0566)
+  [predict] batch 0/587
+  [predict] batch 100/587
+  [predict] batch 200/587
+  [predict] batch 300/587
+  [predict] batch 400/587
+  [predict] batch 500/587
+
+[eval] test EER (src.eval.metrics, train.py's implementation) : 0.0693
+[eval] test EER (src.utils.metrics, mcnemar_test.py's implementation): 0.0693
+[eval] EER threshold used for pred (src.utils.metrics): 0.187827
+
+[done] wrote 18769 predictions to results/preds_C0_aac_128.csv (bonafide=7520, spoof=11249)
