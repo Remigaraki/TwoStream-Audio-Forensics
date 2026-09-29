@@ -1,0 +1,18 @@
+# Demo runtime only (separate from the research requirements.txt).
+# CPU wheels: pip install -r demo/requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0
+torchaudio==2.11.0
+# pca.pkl was pickled by scikit-learn 1.8.0 (its embedded _sklearn_version);
+# pin the same version instead of silencing InconsistentVersionWarning.
+scikit-learn==1.8.0
+joblib==1.5.3
+numpy==2.3.5
+scipy==1.16.3
+soundfile==0.13.1
+# Import-only: src/stream2/cqcc.py imports librosa at module level; the demo's
+# LFCC-only models never call it.
+librosa==0.11.0
+numba==0.67.0
+llvmlite==0.49.0
+streamlit==1.50.0
+psutil==7.1.3

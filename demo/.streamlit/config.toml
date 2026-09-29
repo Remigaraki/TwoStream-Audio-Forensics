@@ -1,0 +1,13 @@
+[server]
+maxUploadSize = 20          # MB; matches inference.MAX_UPLOAD_BYTES
+headless = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+showErrorDetails = false    # no tracebacks to visitors
+toolbarMode = "minimal"
+
+[logger]
+level = "warning"
