@@ -1,0 +1,13 @@
+{
+  "model": "B1",
+  "variant": "synthetic",
+  "pca_k": 64,
+  "pca_sha256": "a7212d003eb03abfcadc46b9270883f3ef929fea2da27d1953bdc24c546299e1",
+  "code_sha": "ef1e92faf82dbb1ac0c2294c0121697b1dd13c12",
+  "manifest_hash": "ed4808bb0456de26",
+  "epochs": 10,
+  "lr": "1e-4",
+  "batch_size": 32,
+  "seed": 42,
+  "augment": "none"
+}
