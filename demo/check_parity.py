@@ -9,8 +9,10 @@ Tolerance: |demo - csv| <= 1e-4. The CSV stores 6 decimals and was produced on
 a GPU in batches of 32; BatchNorm is in eval mode, so batching does not change
 per-utterance outputs, leaving only float32 CPU/GPU kernel differences.
 
-    python demo/check_parity.py --model C1 --manifest data/manifest.csv \
-        --data_root /path/to/flac_T_and_D --limit 200
+    python demo/check_parity.py --model C1 --manifest /kaggle/working/manifest.csv --limit 200
+
+No --data_root for clean audio: the evaluated manifest's absolute paths span
+flac_T and flac_D. (Part C of notebooks/Kaggle_Demo_Calibration.ipynb.)
 """
 from __future__ import annotations
 

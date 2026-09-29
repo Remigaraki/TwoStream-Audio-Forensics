@@ -83,19 +83,27 @@ warnings-as-errors and raises no `InconsistentVersionWarning`, and `transform` m
   shows a *Provisional threshold* warning with every result.
 - **To calibrate** (needs the ASVspoof 5 validation audio, e.g. on Kaggle; a GPU is recommended):
 
+  **On Kaggle, use `notebooks/Kaggle_Demo_Calibration.ipynb`.** It runs everything below plus the
+  parity check, resumes across sessions, and deletes codec audio once it has been scored. The
+  underlying commands are:
+
   ```bash
   # 1. Codec-compressed copies of the VALIDATION audio (separate folder from the test copies).
   #    On a Windows console, prefix with PYTHONIOENCODING=utf-8 (the script prints emoji).
-  python scripts/make_codec_testsets.py --manifest data/manifest.csv \
+  python scripts/make_codec_testsets.py --manifest /kaggle/working/manifest.csv \
       --output_base /kaggle/tmp/codec_val --split val
 
   # 2. Calibrate on clean validation audio, then check the threshold on each codec condition.
+  #    No --data_root: the manifest's absolute paths span both flac_T and flac_D.
   python demo/calibrate_threshold.py --model C1 --operating_point min_dcf \
-      --manifest data/manifest.csv --data_root /path/to/flac \
-      --codec_root /kaggle/tmp/codec_val \
-      --scores_csv demo/calibration/val_scores_C1.csv
+      --manifest /kaggle/working/manifest.csv \
+      --codec_root /kaggle/tmp/codec_val --cache_dir /kaggle/working/calibration
   python demo/calibrate_threshold.py --model A1 ...   # same arguments
   ```
+
+  **Resumable:** `--cache_dir` stores each model's validation scores per condition, keyed by
+  checkpoint hash. Re-runs reuse them (bit-identical thresholds), so a codec folder can be deleted
+  once scored. These CSVs are also the audit trail.
 
   **Operating point** (`--operating_point`):
   - `eer` (default): the point where the two error rates are equal.
@@ -119,8 +127,9 @@ warnings-as-errors and raises no `InconsistentVersionWarning`, and `transform` m
   counts, both operating points, error rates at the chosen threshold, the codec check, git commit,
   torch version and time.
 
-  **Status: not run on real data.** Tested only on synthetic clips (24 tests, plus a dry run with
-  real FFmpeg Opus/MP3/AAC transcodes of the validation split): the guards fire, and the codec
+  **Status: not run on real data.** Tested only on synthetic clips (24 tests, a dry run with
+  real FFmpeg Opus/MP3/AAC transcodes of the validation split, and a full simulated run of the
+  Kaggle notebook against a local clone): the guards fire, and the codec
   check and provenance write work.
 
 ## Score parity with the evaluation pipeline: pending
@@ -129,8 +138,8 @@ No ASVspoof 5 audio is available on this machine, so parity with the committed C
 been verified. Where the audio lives:
 
 ```bash
-python demo/check_parity.py --model C1 --manifest data/manifest.csv --data_root /path/to/flac --limit 200
-python demo/check_parity.py --model A1 --manifest data/manifest.csv --data_root /path/to/flac --limit 200
+python demo/check_parity.py --model C1 --manifest /kaggle/working/manifest.csv --limit 200   # Part C of the notebook
+python demo/check_parity.py --model A1 --manifest /kaggle/working/manifest.csv --limit 200
 ```
 Tolerance is 1e-4 absolute. The CSV stores 6 decimals and came from GPU inference; BatchNorm is in
 eval mode, so batching does not change per-utterance output. The script exits non-zero on any

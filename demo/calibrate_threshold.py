@@ -18,16 +18,25 @@ at the clean-validation threshold and reports error rates and cost against the
 best achievable on that condition. It is a report only; it never changes the
 threshold.
 
+Resumable (--cache_dir): each model's validation scores are cached per
+condition (clean, opus_16, ...) keyed by checkpoint hash, so a killed session
+loses at most one condition, and a codec folder can be deleted once scored.
+Re-running reuses the cache; delete a file to force re-scoring.
+
 Error names follow build_results.py: miss = bona fide flagged as spoof,
 false alarm = spoof accepted as bona fide.
 
 Needs the ASVspoof 5 validation audio, so it is meant for the research
 environment (Kaggle/Colab); a GPU helps but is not required.
 
-    python demo/calibrate_threshold.py --model C1 --operating_point min_dcf \
-        --manifest data/manifest.csv --data_root /path/to/flac \
-        --codec_root /kaggle/tmp/codec_val \
-        --scores_csv demo/calibration/val_scores_C1.csv
+    python demo/calibrate_threshold.py --model C1 --operating_point min_dcf \\
+        --manifest /kaggle/working/manifest.csv \\
+        --codec_root /kaggle/tmp/codec_val \\
+        --cache_dir /kaggle/working/calibration
+
+No --data_root for clean audio: the evaluated manifest stores absolute paths
+into both flac_T and flac_D, and the validation split draws from both.
+See notebooks/Kaggle_Demo_Calibration.ipynb for the full Kaggle workflow.
 """
 from __future__ import annotations
 
@@ -106,7 +115,34 @@ def score_split(model, manifest: str, data_root: str | None, device, batch_size:
             labels.extend(y.int().tolist())
             if step % 100 == 0:
                 print(f"  [val] batch {step}/{len(loader)}", flush=True)
-    return ds.records, np.asarray(scores, np.float32), np.asarray(labels, np.int32)
+    return [r["utterance_id"] for r in ds.records], np.asarray(scores, np.float32), np.asarray(labels, np.int32)
+
+
+def cached_scores(path: Path | None, expected_ids: list[str], compute):
+    """Load (ids, scores, labels) from `path` if present, else compute and save it.
+
+    Scores are written with 9 significant digits, which round-trips float32
+    exactly, so cached and fresh runs give bit-identical thresholds.
+    """
+    if path is not None and path.is_file():
+        with open(path, encoding="utf-8") as fh:
+            rows = list(csv.DictReader(fh))
+        ids = [r["utterance_id"] for r in rows]
+        if ids != expected_ids:
+            raise SystemExit(f"{path} does not match the manifest's validation split; delete it and re-run")
+        print(f"  [cache] reusing {path.name}")
+        return (ids, np.array([float(r["score"]) for r in rows], np.float32),
+                np.array([int(r["true_label"]) for r in rows], np.int32))
+    ids, scores, labels = compute()
+    if path is not None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".partial")
+        with open(tmp, "w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh)
+            w.writerow(["utterance_id", "true_label", "score"])
+            w.writerows((u, int(lab), f"{s:.9g}") for u, lab, s in zip(ids, labels, scores))
+        tmp.replace(path)  # only complete files ever appear under the final name
+    return ids, scores, labels
 
 
 def main() -> None:
@@ -119,7 +155,8 @@ def main() -> None:
                     help="Output base of `make_codec_testsets.py --split val`; subdirs like opus_16/ are checked.")
     ap.add_argument("--batch_size", type=int, default=32)
     ap.add_argument("--num_workers", type=int, default=4)
-    ap.add_argument("--scores_csv", default=None, help="Optional audit file of per-utterance clean val scores.")
+    ap.add_argument("--cache_dir", default=None,
+                    help="Per-condition validation score CSVs (also the audit trail); makes runs resumable.")
     ap.add_argument("--allow_manifest_mismatch", action="store_true")
     args = ap.parse_args()
 
@@ -132,8 +169,18 @@ def main() -> None:
     ckpt_rel, ckpt_sha = inf.MODELS[args.model]["checkpoint"]
     logged_val_eer = float(torch.load(inf.ROOT / ckpt_rel, map_location="cpu", weights_only=True)["val_eer"])
 
-    run = lambda root: score_split(model, args.manifest, root, device, args.batch_size, args.num_workers)  # noqa: E731
-    records, scores, labels = run(args.data_root)
+    with open(args.manifest, encoding="utf-8") as fh:
+        val_ids = sorted(r["utterance_id"] for r in csv.DictReader(fh) if r["split"] == SPLIT)
+    cache = Path(args.cache_dir) if args.cache_dir else None
+
+    def cache_path(condition: str) -> Path | None:
+        return cache / f"val_{args.model}_{ckpt_sha[:12]}_{condition}.csv" if cache else None
+
+    def scores_for(condition: str, root: str | None):
+        return cached_scores(cache_path(condition), val_ids, lambda: score_split(
+            model, args.manifest, root, device, args.batch_size, args.num_workers))
+
+    _, scores, labels = scores_for("clean", args.data_root)
 
     eer_train = compute_eer_traintime(scores, labels)
     eer, eer_tau = compute_eer_with_threshold(labels, scores)
@@ -157,10 +204,11 @@ def main() -> None:
     if args.codec_root:
         for codec, bitrate in CODEC_CONDITIONS:
             cond_dir = Path(args.codec_root) / f"{codec}_{bitrate}"
-            if not cond_dir.is_dir():
+            cached = cache is not None and cache_path(cond_dir.name).is_file()
+            if not (cached or cond_dir.is_dir()):
                 print(f"[codec] {cond_dir.name}: not generated, skipped")
                 continue
-            _, c_scores, c_labels = run(str(cond_dir))
+            _, c_scores, c_labels = scores_for(cond_dir.name, str(cond_dir))
             m, f = error_rates(c_scores, c_labels, tau)
             _, c_best = min_dcf_threshold(c_scores, c_labels)
             codec_check[cond_dir.name] = {
@@ -169,13 +217,6 @@ def main() -> None:
             }
             print(f"[codec] {cond_dir.name}: miss={m:.4%} false_alarm={f:.4%} "
                   f"DCF={dcf(m, f):.5f} (best achievable {c_best:.5f})")
-
-    if args.scores_csv:
-        Path(args.scores_csv).parent.mkdir(parents=True, exist_ok=True)
-        with open(args.scores_csv, "w", newline="", encoding="utf-8") as fh:
-            w = csv.writer(fh)
-            w.writerow(["utterance_id", "true_label", "score"])
-            w.writerows((r["utterance_id"], int(lab), f"{s:.6f}") for r, lab, s in zip(records, labels, scores))
 
     point = ("equal-error-rate" if args.operating_point == "eer"
              else f"minimum-DCF (pi_spoof={PI_SPOOF}, C_miss={C_MISS}, C_fa={C_FA})")
