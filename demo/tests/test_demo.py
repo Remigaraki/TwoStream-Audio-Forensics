@@ -245,9 +245,17 @@ def test_calibration_end_to_end_with_codec_check(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv", [
         "x", "--model", "C1", "--manifest", str(manifest), "--data_root", str(tmp_path),
         "--operating_point", "min_dcf", "--codec_root", str(tmp_path / "codec"),
-        "--num_workers", "0", "--allow_manifest_mismatch"])
+        "--num_workers", "0", "--allow_manifest_mismatch", "--cache_dir", str(tmp_path / "cache")])
+    cal.main()
+    first = json.loads(thr.read_text())["C1"]
+    # Resume: codec audio deleted after scoring; everything must come from the cache, identically.
+    shutil.rmtree(tmp_path / "codec" / "opus_16")
+    monkeypatch.setattr(cal, "score_split", lambda *a, **k: pytest.fail("cache not used"))
     cal.main()
     c1 = json.loads(thr.read_text())["C1"]
+    assert c1["threshold"] == first["threshold"]
+    assert c1["provenance"]["codec_check_val"] == first["provenance"]["codec_check_val"]
+    assert len(list((tmp_path / "cache").glob("val_C1_*_*.csv"))) == 2  # clean + opus_16
     prov = c1["provenance"]
     assert c1["status"] == "validation" and "minimum-DCF" in c1["source"]
     assert prov["n_bonafide"] + prov["n_spoof"] == 8 and c1["threshold"] == prov["val_min_dcf_threshold"]
