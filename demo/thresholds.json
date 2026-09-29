@@ -1,0 +1,12 @@
+{
+  "C1": {
+    "threshold": 0.5,
+    "status": "provisional",
+    "source": "Uncalibrated default of 0.5. Not derived from any data; not a validated operating point. Replace by running demo/calibrate_threshold.py on the validation split."
+  },
+  "A1": {
+    "threshold": 0.5,
+    "status": "provisional",
+    "source": "Uncalibrated default of 0.5. Not derived from any data; not a validated operating point. Replace by running demo/calibrate_threshold.py on the validation split."
+  }
+}

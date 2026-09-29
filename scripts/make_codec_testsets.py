@@ -13,6 +13,13 @@ Usage — one condition (recommended: generate, predict, delete, repeat):
         --output_base /kaggle/tmp/codec_test \\
         --conditions opus_16
 
+Usage — validation copies for demo threshold checks (demo/calibrate_threshold.py);
+use a separate --output_base so they never mix with the test-set copies:
+    python scripts/make_codec_testsets.py \\
+        --manifest /kaggle/working/manifest.csv \\
+        --output_base /kaggle/tmp/codec_val \\
+        --split val --conditions opus_16
+
 Usage — split one condition across accounts:
     python scripts/make_codec_testsets.py \\
         --manifest /kaggle/working/manifest.csv \\
@@ -52,6 +59,8 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--conditions", default=None,
                    help="Comma-separated condition labels (e.g. opus_16,mp3_64). "
                         "Default: all 6 conditions in CODEC_CONDITIONS.")
+    p.add_argument("--split", default="test", choices=["test", "val"],
+                   help="Manifest split to transcode (default: test, as for the thesis results).")
     p.add_argument("--shard", default=None,
                    help="i/N — process only every Nth row starting at i, "
                         "for splitting one condition across accounts.")
@@ -72,9 +81,9 @@ def main() -> None:
         conditions = [(label, c, b) for label, (c, b) in all_labels.items()]
 
     with open(args.manifest, "r", encoding="utf-8") as fh:
-        rows = [r for r in csv.DictReader(fh) if r["split"] == "test"]
+        rows = [r for r in csv.DictReader(fh) if r["split"] == args.split]
     rows.sort(key=lambda r: r["utterance_id"])
-    print(f"[init] {len(rows)} test-split rows loaded from manifest", flush=True)
+    print(f"[init] {len(rows)} {args.split}-split rows loaded from manifest", flush=True)
 
     if args.shard:
         i, n = _parse_shard(args.shard)
