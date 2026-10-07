@@ -57,6 +57,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from demo import inference as inf  # noqa: E402
+from demo.artifact_identity import file_sha256, model_identity, verify_cache_metadata, write_cache_metadata  # noqa: E402
 from src.train import _ManifestDataset  # noqa: E402
 from src.eval.metrics import compute_eer as compute_eer_traintime  # noqa: E402
 from src.pipeline.augment import CODEC_CONDITIONS  # noqa: E402
@@ -118,18 +119,24 @@ def score_split(model, manifest: str, data_root: str | None, device, batch_size:
     return [r["utterance_id"] for r in ds.records], np.asarray(scores, np.float32), np.asarray(labels, np.int32)
 
 
-def cached_scores(path: Path | None, expected_ids: list[str], compute):
+def cached_scores(path: Path | None, expected_ids: list[str], compute, *, identity=None, split_hash=None, expected_labels=None):
     """Load (ids, scores, labels) from `path` if present, else compute and save it.
 
     Scores are written with 9 significant digits, which round-trips float32
     exactly, so cached and fresh runs give bit-identical thresholds.
     """
     if path is not None and path.is_file():
+        if identity is None:
+            raise ValueError('Cache reuse requires model and preprocessing identity')
+        verify_cache_metadata(path, identity, split_hash)
         with open(path, encoding="utf-8") as fh:
             rows = list(csv.DictReader(fh))
         ids = [r["utterance_id"] for r in rows]
         if ids != expected_ids:
             raise SystemExit(f"{path} does not match the manifest's validation split; delete it and re-run")
+        if expected_labels is not None:
+            from demo.calibration_resume import validate_scores
+            validate_scores(path, expected_labels)
         print(f"  [cache] reusing {path.name}")
         return (ids, np.array([float(r["score"]) for r in rows], np.float32),
                 np.array([int(r["true_label"]) for r in rows], np.int32))
@@ -142,6 +149,7 @@ def cached_scores(path: Path | None, expected_ids: list[str], compute):
             w.writerow(["utterance_id", "true_label", "score"])
             w.writerows((u, int(lab), f"{s:.9g}") for u, lab, s in zip(ids, labels, scores))
         tmp.replace(path)  # only complete files ever appear under the final name
+        write_cache_metadata(path, identity, split_hash)
     return ids, scores, labels
 
 
@@ -158,6 +166,8 @@ def main() -> None:
     ap.add_argument("--cache_dir", default=None,
                     help="Per-condition validation score CSVs (also the audit trail); makes runs resumable.")
     ap.add_argument("--allow_manifest_mismatch", action="store_true")
+    ap.add_argument("--thresholds_output", default=str(ROOT / 'demo/thresholds.candidate.json'),
+                    help="Staged calibration output; never installed automatically.")
     args = ap.parse_args()
 
     split_hash = compute_split_hash(pd.read_csv(args.manifest, usecols=["utterance_id", "split"]))
@@ -170,7 +180,12 @@ def main() -> None:
     logged_val_eer = float(torch.load(inf.ROOT / ckpt_rel, map_location="cpu", weights_only=True)["val_eer"])
 
     with open(args.manifest, encoding="utf-8") as fh:
-        val_ids = sorted(r["utterance_id"] for r in csv.DictReader(fh) if r["split"] == SPLIT)
+        val_rows = [r for r in csv.DictReader(fh) if r['split'] == SPLIT]
+    expected_labels = {r['utterance_id']: int(r['label']) for r in val_rows}
+    val_ids = sorted(expected_labels)
+    if len(val_ids) != len(val_rows):
+        raise ValueError('Duplicate validation IDs')
+    identity = model_identity(args.model, inf.MODELS[args.model])
     cache = Path(args.cache_dir) if args.cache_dir else None
 
     def cache_path(condition: str) -> Path | None:
@@ -178,7 +193,8 @@ def main() -> None:
 
     def scores_for(condition: str, root: str | None):
         return cached_scores(cache_path(condition), val_ids, lambda: score_split(
-            model, args.manifest, root, device, args.batch_size, args.num_workers))
+            model, args.manifest, root, device, args.batch_size, args.num_workers),
+            identity=identity, split_hash=split_hash, expected_labels=expected_labels)
 
     _, scores, labels = scores_for("clean", args.data_root)
 
@@ -221,13 +237,16 @@ def main() -> None:
     point = ("equal-error-rate" if args.operating_point == "eer"
              else f"minimum-DCF (pi_spoof={PI_SPOOF}, C_miss={C_MISS}, C_fa={C_FA})")
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
-    data = json.loads(inf.THRESHOLDS_PATH.read_text(encoding="utf-8"))
+    output = Path(args.thresholds_output)
+    data = json.loads((output if output.exists() else inf.THRESHOLDS_PATH).read_text(encoding="utf-8"))
     data[args.model] = {
         "threshold": tau,
         "status": "validation",
         "source": f"{point} operating point on the clean validation split ({len(labels)} utterances) "
                   "of the evaluated manifest.",
         "provenance": {
+            "identity": identity,
+            "clean_cache_sha256": file_sha256(cache_path('clean')) if cache else None,
             "split": SPLIT, "manifest_split_hash": split_hash, "operating_point": args.operating_point,
             "n_bonafide": int((labels == 0).sum()), "n_spoof": int((labels == 1).sum()),
             "val_miss_at_threshold": p_miss, "val_false_alarm_at_threshold": p_fa,
@@ -241,8 +260,8 @@ def main() -> None:
             "created_utc": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         },
     }
-    inf.THRESHOLDS_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-    print(f"[done] wrote {args.model} threshold to {inf.THRESHOLDS_PATH}")
+    output.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    print(f"[done] staged {args.model} threshold at {output}; parity required before installation")
 
 
 if __name__ == "__main__":
