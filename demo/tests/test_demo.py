@@ -196,7 +196,8 @@ def test_app_analyze_flow_long_clip_with_a1(tmp_path, monkeypatch):
         "Likely bona fide speech", "Likely synthetic or spoofed speech") for v in verdicts)
     text = " ".join(m.value for m in at.markdown)
     assert "0.00 s-4.00 s" in text and "9.00 s recording" in text and "**not** analysed" in text
-    assert any("Provisional threshold" in c.value for c in at.caption)
+    for entry in inf.load_thresholds().values():
+        assert any(entry['source'] in c.value for c in at.caption)
     assert [m.label for m in at.metric].count("Model score") == 2
 
 
@@ -204,6 +205,17 @@ def test_app_rejects_silent_upload(tmp_path, monkeypatch):
     sf.write(tmp_path / "z.wav", np.zeros(32000, np.float32), 16000)
     at = _run_app(monkeypatch, _FakeUpload(tmp_path / "z.wav"))
     assert any("silent" in e.value for e in at.error) and not at.metric
+
+
+@pytest.mark.parametrize('kind', ['short', 'corrupt'])
+def test_app_rejects_short_and_corrupt_uploads(tmp_path, monkeypatch, kind):
+    if kind == 'short':
+        path = _write(tmp_path, 'short.wav', .17, 16000)
+    else:
+        path = tmp_path / 'broken.flac'
+        path.write_bytes(b'not an audio file')
+    at = _run_app(monkeypatch, _FakeUpload(path))
+    assert at.error and not at.metric
 
 
 def test_min_dcf_threshold_matches_build_results():
@@ -240,13 +252,17 @@ def test_calibration_end_to_end_with_codec_check(tmp_path, monkeypatch):
     for i in range(8):
         shutil.copy(tmp_path / f"V_{i}.flac", tmp_path / "codec" / "opus_16")
     thr = tmp_path / "thresholds.json"
-    shutil.copy(inf.THRESHOLDS_PATH, thr)
+    # Synthetic calibration tests start from independent provisional entries,
+    # not the installed research thresholds or their parity reports.
+    thr.write_text(json.dumps({name: {'threshold': .5, 'status': 'provisional',
+                                     'source': 'Synthetic test fixture'} for name in inf.MODELS}))
     monkeypatch.setattr(inf, "THRESHOLDS_PATH", thr)
     monkeypatch.setattr(cal, "MAX_VAL_EER_DRIFT", 1.0)
     monkeypatch.setattr(sys, "argv", [
         "x", "--model", "C1", "--manifest", str(manifest), "--data_root", str(tmp_path),
         "--operating_point", "min_dcf", "--codec_root", str(tmp_path / "codec"),
         "--num_workers", "0", "--allow_manifest_mismatch", "--cache_dir", str(tmp_path / "cache")])
+    sys.argv.extend(['--thresholds_output', str(thr)])
     cal.main()
     first = json.loads(thr.read_text())["C1"]
     # Resume: codec audio deleted after scoring; everything must come from the cache, identically.
@@ -263,7 +279,8 @@ def test_calibration_end_to_end_with_codec_check(tmp_path, monkeypatch):
     assert set(prov["codec_check_val"]) == {"opus_16"}  # other conditions absent -> skipped
     assert json.loads(thr.read_text())["A1"]["status"] == "provisional"
     monkeypatch.setattr(inf, "THRESHOLDS_PATH", thr)
-    assert inf.load_thresholds()["C1"]["threshold"] == c1["threshold"]  # app can still load it
+    with pytest.raises(inf.AssetError, match='not parity verified'):
+        inf.load_thresholds()  # calibration alone must not activate a threshold
 
 
 def test_min_dcf_mixed_label_ties_are_achievable():

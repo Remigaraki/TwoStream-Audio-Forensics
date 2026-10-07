@@ -38,11 +38,14 @@ class LFCCExtractor(nn.Module):
             [batch, 2*n_lfcc]  (mean + std along time axis, concat)
         """
         # x: [B, 1, T] -> squeeze channel -> [B, T]
-        if x.dim() == 3:
-            x = x.squeeze(1)  # [B, T]
+        # Preserve [batch, channel, time] so decibel clipping is
+        # independent for each recording.
+        if x.dim() == 2:
+            x = x.unsqueeze(1)
+        if x.dim() != 3 or x.shape[1] != 1:
+            raise ValueError("Expected mono waveforms [batch, 1, time]")
 
-        # LFCC expects [B, T] or [B, 1, T]; returns [B, n_lfcc, T_frames]
-        feats = self.lfcc_transform(x)  # [B, n_lfcc, T_frames]
+        feats = self.lfcc_transform(x).squeeze(1)  # [B, n_lfcc, frames]
 
         mean = feats.mean(dim=2)   # [B, n_lfcc]
         std = feats.std(dim=2)     # [B, n_lfcc]

@@ -142,6 +142,9 @@ Validation EER logged in the checkpoints: C1 0.86%, A1 1.05%.
 
 ### Reported test EER (%) - `results/tables/table_eer.md`
 """)
+    st.caption("Historical research results. The LFCC-based models were evaluated before the "
+               "per-recording LFCC batch-independence correction. These preserved numbers "
+               "are not a new evaluation of the corrected demo or its validation thresholds.")
     table = root / "results" / "tables" / "table_eer.md"
     st.markdown(table.read_text(encoding="utf-8").split("\n", 2)[-1] if table.exists()
                 else "_Table not bundled with this build._")
@@ -168,8 +171,10 @@ uploads here, and they are not combined with C1 or A1.
   languages, recording conditions or newer synthesis systems, and it is not an accuracy.
 
 ### How the demo differs from the evaluation
-- Identical preprocessing to the evaluation pipeline: 16 kHz, mono, the first 4 s
+- Waveform preprocessing matches the evaluation pipeline: 16 kHz, mono, the first 4 s
   (64,000 samples), zero-padded if shorter, with no normalisation.
+- C1 now uses per-recording LFCC clipping, correcting batch-dependent features in the
+  historical evaluation. Corrected validation calibration is separate from that test table.
 - The demo's decision threshold is separate from the research EER operating point. The
   threshold's status (provisional or validation-derived) is shown with every result.
 
