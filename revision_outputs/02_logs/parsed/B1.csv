@@ -1,0 +1,8 @@
+run,segment,log epoch (1-based),train_loss,val_eer_fraction,lr,batches_per_sec,mean_label,source
+B1,B1_artifacts.zip,4,0.1799,0.0665,1.00e-04,0.4,0.599,[log: B1_artifacts.zip/training.log]
+B1,B1_artifacts.zip,5,0.1746,0.0669,1.00e-04,0.4,0.599,[log: B1_artifacts.zip/training.log]
+B1,B1_artifacts.zip,6,0.1727,0.0664,1.00e-04,0.4,0.599,[log: B1_artifacts.zip/training.log]
+B1,B1_artifacts.zip,7,0.1685,0.0663,1.00e-04,0.4,0.599,[log: B1_artifacts.zip/training.log]
+B1,B1_artifacts (1).zip,8,0.1662,0.0620,1.00e-04,0.4,0.599,[log: B1_artifacts (1).zip/training.log]
+B1,B1_artifacts (1).zip,9,0.1645,0.0661,1.00e-04,0.4,0.599,[log: B1_artifacts (1).zip/training.log]
+B1,B1_artifacts (1).zip,10,0.1626,0.0604,1.00e-04,0.4,0.599,[log: B1_artifacts (1).zip/training.log]

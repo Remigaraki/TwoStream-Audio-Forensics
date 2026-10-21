@@ -1,0 +1,3 @@
+B1_per_epoch.png: Recovered partial training history of B1 for log epochs 4-10. Training loss and validation EER are copied from the two surviving ZIP log segments; log epochs 1-3 are unavailable. Retained best checkpoint is stored epoch 9 / log epoch 10; rounded log EER agrees with its exact 6.0414959% metadata.
+
+trajectory_best_so_far.png: Validation EER of saved checkpoints, not a complete per-epoch training history. B0/C0 intermediate checkpoint membership is candidate lineage, unconfirmed. Isolated points avoid asserting resume continuity. Filename dates and increasing epoch indices do not prove one run.

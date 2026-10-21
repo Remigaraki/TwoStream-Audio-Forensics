@@ -1,0 +1,38 @@
+FILES 49 ALIGNMENT AND LABELS PASS; bona/spoof 7520 11249
+MAX EER DIFF 1.3010426069826053e-16 MAX DCF DIFF 2.0816681711721685e-16
+condition  aac_128   clean  mp3_128   mp3_64  opus_16  opus_32  opus_64
+model                                                                  
+A0          1.6246  1.5447   5.8658   5.7703   9.4833   3.8306   1.5558
+A1          1.0120  0.9965   1.5291   1.5979   2.9518   1.6468   0.9588
+B0          7.5392  7.5014  12.8079  13.4316  18.3497  11.5296   8.2582
+B1          7.8699  7.5769  10.1447  10.5864  18.3230  10.5176   8.6733
+C0          6.9266  6.7557   9.0949   9.5322  16.3944   9.1904   7.4859
+C1          0.8900  0.8101   1.6246   1.7000   2.3814   1.3161   0.7990
+C2          0.9588  0.9166   1.6889   1.7844   2.4724   1.3316   0.8633
+ALL 42 MCNEMAR COUNTS AND STATISTICS MATCH
+comparison condition  n01  n10      chi2  p_value  holm_p_within_7_conditions
+  C1 vs A1     clean  122   89  4.853081 0.027597                    0.137984
+  C2 vs C1     clean   16   34  5.780000 0.016210                    0.113467
+  C1 vs A1   opus_16  353  246 18.757930 0.000015                    0.000104
+  C2 vs C1   opus_16   38   55  2.752688 0.097091                    0.464460
+  C1 vs A1   opus_32  207  147  9.833333 0.001714                    0.010283
+  C2 vs C1   opus_32   34   35  0.000000 1.000000                    1.000000
+  C1 vs A1   opus_64  118   88  4.082524 0.043329                    0.173316
+  C2 vs C1   opus_64   18   29  2.127660 0.144661                    0.464460
+  C1 vs A1    mp3_64  191  210  0.807980 0.368718                    0.727778
+  C2 vs C1    mp3_64   17   33  4.500000 0.033895                    0.203369
+  C1 vs A1   mp3_128  187  206  0.824427 0.363889                    0.727778
+  C2 vs C1   mp3_128   23   34  1.754386 0.185326                    0.464460
+  C1 vs A1   aac_128  122   98  2.404545 0.120983                    0.362950
+  C2 vs C1   aac_128   19   32  2.823529 0.092892                    0.464460
+CHECKPOINT A0 {'epoch': 10, 'val_eer': 0.015557724516410916}
+CHECKPOINT A1 {'epoch': 13, 'val_eer': 0.010505970763041527}
+CHECKPOINT B0 {'epoch': 4, 'val_eer': 0.07594063133412454}
+CHECKPOINT B1 {'epoch': 9, 'val_eer': 0.06041495899722572}
+CHECKPOINT C0 {'epoch': 12, 'val_eer': 0.056640613177567266}
+CHECKPOINT C1 {'epoch': 6, 'val_eer': 0.008633686177779123}
+CHECKPOINT C2 {'epoch': 3, 'val_eer': 0.009432693471747224}
+STREAM EQUALITY stream1. 64 64
+STREAM EQUALITY stream2. 24 24
+C1/A1 stream1 cosine including float buffers 0.9961718025246697
+DONE

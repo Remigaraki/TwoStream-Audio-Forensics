@@ -1,0 +1,6 @@
+0a4becd 2026-08-17T21:44:21+08:00 Add build_manifest.py and verify_manifest.py: the actual Phase 0 manifest builder
+
+ALL BUILDER COMMITS
+0a4becd 2026-08-17T21:44:21+08:00 Add build_manifest.py and verify_manifest.py: the actual Phase 0 manifest builder
+
+Earliest filename timestamp found: 0624_0314 (B0 candidate), June 24, year NOT FOUND in filename. August 17, 2026 is the recovery/commit date, not proof of the original design date. No before-results claim can be established from this history alone.

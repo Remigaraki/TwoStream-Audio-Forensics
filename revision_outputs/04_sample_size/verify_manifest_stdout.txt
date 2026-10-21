@@ -1,0 +1,8 @@
+manifest:  outputs/returned_parity_20261007/manifest.reference.csv
+rows:      125,123
+hash:      ed4808bb0456de26
+reference: ed4808bb0456de26
+sizes:     {'train': 87585, 'val': 18769, 'test': 18769}
+test bonafide fraction: 0.4007
+
+PASS: manifest matches the training split.

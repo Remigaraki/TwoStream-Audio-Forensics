@@ -1,0 +1,1 @@
+outputs/verified_demo_browser.png is an existing demo screenshot; visually check its label before reuse. Thesis embedded demo images were not independently re-rendered; retake any showing Model score.
