@@ -38,7 +38,7 @@ def show_result(name: str, s: float, secs: float, thresholds: dict) -> None:
     verdict = inf.decide(s, t["threshold"])
     (st.warning if s >= t["threshold"] else st.success)(f"**{verdict}**")
     c1, c2, c3 = st.columns(3)
-    c1.metric("Model score", f"{s:.4f}", help="Sigmoid output of the network; higher = more spoof-like. "
+    c1.metric("Spoof score", f"{s:.4f}", help="Sigmoid output of the network; higher = more spoof-like. "
               "Not a calibrated probability.")
     c2.metric("Decision threshold", f"{t['threshold']:.4f}")
     c3.metric("Inference time", fmt_s(secs))

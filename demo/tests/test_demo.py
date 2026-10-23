@@ -198,7 +198,7 @@ def test_app_analyze_flow_long_clip_with_a1(tmp_path, monkeypatch):
     assert "0.00 s-4.00 s" in text and "9.00 s recording" in text and "**not** analysed" in text
     for entry in inf.load_thresholds().values():
         assert any(entry['source'] in c.value for c in at.caption)
-    assert [m.label for m in at.metric].count("Model score") == 2
+    assert [m.label for m in at.metric].count("Spoof score") == 2
 
 
 def test_app_rejects_silent_upload(tmp_path, monkeypatch):

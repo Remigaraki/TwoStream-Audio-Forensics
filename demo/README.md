@@ -1,6 +1,6 @@
 # Research demo (Streamlit, CPU)
 
-Upload a speech recording and get a **C1** model score and a bona fide / spoofed
+Upload a speech recording and get a **C1** spoof score and a bona fide / spoofed
 decision for its **first 4 seconds**. **A1** can be run as a separate comparison, and
 its score is never combined with C1's. Nothing in `src/`, `scripts/`, `results/` or the
 checkpoints is modified by the demo.
@@ -44,7 +44,7 @@ Offline Docker fallback (after one build): `docker run --rm -p 7860:7860 twostre
 `augment="none"`: `sf.read(float32)` → `[C, N]` → `torchaudio.functional.resample` to 16 kHz →
 channel mean → first 64,000 samples, or zero-padded if shorter → `[1, 1, 64000]` float32. It adds
 no normalisation, trimming, denoising, augmentation or window aggregation. The network ends in
-`Sigmoid`, and the demo shows that output as the **model score** with no second sigmoid. It is not
+`Sigmoid`, and the demo shows that output as the **spoof score** with no second sigmoid. It is not
 presented as a calibrated probability. The decision rule is `score >= threshold → spoofed`, the
 same direction as `predict_testset.py`.
 
