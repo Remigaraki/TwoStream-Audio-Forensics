@@ -1,0 +1,7 @@
+archive,file,stored epoch (0-based),log epoch (1-based),val_eer_fraction,sha256,matches_repo_B1,source
+B1_artifacts (1).zip,best.pt,9,10,0.06041495899722572,75ca78fcad22085789d0d9e36cef0007d96fa38db7a1def7c2b344e474867437,True,[checkpoint: B1_artifacts (1).zip/best.pt]
+B1_artifacts (1).zip,latest.pt,9,10,0.06041495899722572,1ebcbc4e333eeb88474b8cfe4f2ee7eea3a0292d84944c7889116048bdf786c4,False,[checkpoint: B1_artifacts (1).zip/latest.pt]
+B1_artifacts (2).zip,best.pt,9,10,0.06041495899722572,75ca78fcad22085789d0d9e36cef0007d96fa38db7a1def7c2b344e474867437,True,[checkpoint: B1_artifacts (2).zip/best.pt]
+B1_artifacts (3).zip,best.pt,9,10,0.06041495899722572,75ca78fcad22085789d0d9e36cef0007d96fa38db7a1def7c2b344e474867437,True,[checkpoint: B1_artifacts (3).zip/best.pt]
+B1_artifacts.zip,best.pt,6,7,0.06634528736278911,2d4012d51171d1b12024d50446905e6f4ad876aad0b6749673f0b47e59e44999,False,[checkpoint: B1_artifacts.zip/best.pt]
+B1_artifacts.zip,latest.pt,6,7,0.06634528736278911,c8b9d15ec83ba43edde4e611fd49e40dc4ff5eaf60a5e62eef754d1b0c8e03ac,False,[checkpoint: B1_artifacts.zip/latest.pt]

@@ -1,0 +1,87 @@
+{
+  "source": "[checkpoint: checkpoints/setup_b/best_b_ep3_eer0750_0713_0222.pt]",
+  "model_tensor_shapes": {
+    "stream2.lfcc.lfcc_transform.filter_mat": [
+      201,
+      128
+    ],
+    "stream2.lfcc.lfcc_transform.dct_mat": [
+      128,
+      60
+    ],
+    "stream2.lfcc.lfcc_transform.Spectrogram.window": [
+      400
+    ],
+    "stream2.mlp.net.0.weight": [
+      256,
+      184
+    ],
+    "stream2.mlp.net.0.bias": [
+      256
+    ],
+    "stream2.mlp.net.1.weight": [
+      256
+    ],
+    "stream2.mlp.net.1.bias": [
+      256
+    ],
+    "stream2.mlp.net.1.running_mean": [
+      256
+    ],
+    "stream2.mlp.net.1.running_var": [
+      256
+    ],
+    "stream2.mlp.net.1.num_batches_tracked": [],
+    "stream2.mlp.net.3.weight": [
+      128,
+      256
+    ],
+    "stream2.mlp.net.3.bias": [
+      128
+    ],
+    "stream2.mlp.net.4.weight": [
+      128
+    ],
+    "stream2.mlp.net.4.bias": [
+      128
+    ],
+    "stream2.mlp.net.4.running_mean": [
+      128
+    ],
+    "stream2.mlp.net.4.running_var": [
+      128
+    ],
+    "stream2.mlp.net.4.num_batches_tracked": [],
+    "stream2.mlp.net.6.weight": [
+      64,
+      128
+    ],
+    "stream2.mlp.net.6.bias": [
+      64
+    ],
+    "stream2.mlp.net.7.weight": [
+      64
+    ],
+    "stream2.mlp.net.7.bias": [
+      64
+    ],
+    "stream2.mlp.net.7.running_mean": [
+      64
+    ],
+    "stream2.mlp.net.7.running_var": [
+      64
+    ],
+    "stream2.mlp.net.7.num_batches_tracked": [],
+    "classifier.0.weight": [
+      1,
+      64
+    ],
+    "classifier.0.bias": [
+      1
+    ]
+  },
+  "metadata": {
+    "epoch": 3,
+    "val_eer": 0.07503000454241848
+  }
+}

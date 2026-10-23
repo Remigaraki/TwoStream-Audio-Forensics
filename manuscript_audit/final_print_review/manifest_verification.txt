@@ -1,0 +1,48 @@
+Full hash ed4808bb0456de26cb04df66ae82219365d057cf172c82fd674d2dab093a8eec prefix ed4808bb0456de26
+Split class counts label      0      1
+split              
+test    7520  11249
+train  35091  52494
+val     7520  11249
+Attack totals attack
+A01          4687
+A02          4687
+A03          4687
+A04          4687
+A05          4687
+A06          4687
+A07          4687
+A08          4687
+A09          4687
+A10          4687
+A11          4687
+A12          4687
+A13          4687
+A14          4687
+A15          4687
+A16          4687
+bonafide    50131
+train speakers 1181 test speakers 1140 shared 1138 test utterances shared speakers 18766
+attack test attack
+A01          709
+A02          702
+A03          743
+A04          673
+A05          704
+A06          723
+A07          669
+A08          654
+A09          738
+A10          708
+A11          717
+A12          677
+A13          717
+A14          726
+A15          681
+A16          708
+bonafide    7520
+Saved CSV test IDs and labels match returned manifest PASS; audio absent locally
+PARITY summary C1 {'schema': 1, 'model': 'C1', 'thresholds_sha256': 'b3a7d7c2c04927333bcaf6765028369c527c7e6ba0435d6808bb940cccbe1784', 'manifest_sha256': '486b93a651d7d3626b3b168273fcdaf2b4539a24d1069bb54114dd5e8b050d7e', 'manifest_split_hash': 'ed4808bb0456de26', 'clean_cache_sha256': 'ca587cf131bdfa475412b7224df381d23b7d91f246e403d9e4c5e74297384a8a', 'split': 'test', 'tolerance': 0.0001, 'selected': 256, 'compared': 256, 'unexpected_rejections': 0, 'clean_cache_compared': 256, 'clean_cache_failures': 0, 'clean_cache_max_difference': 1.1250656532291181e-05, 'passed': True, 'torch': '2.11.0+cu128', 'evaluation_device': 'cpu', 'note': 'No thresholds selected or changed; test scores used only for parity.'}
+nested fields {'selected_label_counts': {'0': 128, '1': 128}, 'clean_cache_label_counts': {'0': 128, '1': 128}}
+PARITY summary A1 {'schema': 1, 'model': 'A1', 'thresholds_sha256': 'b3a7d7c2c04927333bcaf6765028369c527c7e6ba0435d6808bb940cccbe1784', 'manifest_sha256': '486b93a651d7d3626b3b168273fcdaf2b4539a24d1069bb54114dd5e8b050d7e', 'manifest_split_hash': 'ed4808bb0456de26', 'clean_cache_sha256': '15fa16ecaddee74cd72edf16c8d17c30ff48673b482b64be8a5e8e583441210a', 'split': 'test', 'tolerance': 0.0001, 'selected': 256, 'compared': 256, 'unexpected_rejections': 0, 'clean_cache_compared': 256, 'clean_cache_failures': 0, 'clean_cache_max_difference': 1.2546447341943434e-05, 'passed': True, 'torch': '2.11.0+cu128', 'evaluation_device': 'cpu', 'note': 'No thresholds selected or changed; test scores used only for parity.'}
+nested fields {'selected_label_counts': {'0': 128, '1': 128}, 'clean_cache_label_counts': {'0': 128, '1': 128}}

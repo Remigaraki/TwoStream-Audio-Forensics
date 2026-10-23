@@ -1,0 +1,497 @@
+SOURCE: B1_artifacts (1).zip / training.log
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:300: SyntaxWarning: invalid escape sequence '\('
+  m = re.match('([su]([0-9]{1,2})p?) \(([0-9]{1,2}) bit\)$', token)
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:301: SyntaxWarning: invalid escape sequence '\('
+  m2 = re.match('([su]([0-9]{1,2})p?)( \(default\))?$', token)
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:310: SyntaxWarning: invalid escape sequence '\('
+  elif re.match('(flt)p?( \(default\))?$', token):
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:314: SyntaxWarning: invalid escape sequence '\('
+  elif re.match('(dbl)p?( \(default\))?$', token):
+[init] device=cuda
+[init] augment=none augment_prob=0.5 aug_seed=42 (independent of the manifest train/val/test split seed, which is fixed at manifest-generation time and unaffected by this flag)
+[init] reading manifest …
+[init] train_ds=87585 samples
+[init] val_ds=18769 samples
+[init] loaders ready — 2737 train batches, 586 val batches
+[init] building model (setup=B, fusion=attention, features=lfcc) …
+[init] moving model to cuda …
+[init] model ready
+Resumed from /kaggle/working/checkpoints/B1/best.pt (epoch 7)
+  [train] epoch 8 batch 0/2737  loss=0.0528  0.2 batches/sec
+  [train] epoch 8 batch 50/2737  loss=0.0605  0.3 batches/sec
+  [train] epoch 8 batch 100/2737  loss=0.1174  0.4 batches/sec
+  [train] epoch 8 batch 150/2737  loss=0.0677  0.4 batches/sec
+  [train] epoch 8 batch 200/2737  loss=0.1059  0.4 batches/sec
+  [train] epoch 8 batch 250/2737  loss=0.0373  0.4 batches/sec
+  [train] epoch 8 batch 300/2737  loss=0.1695  0.4 batches/sec
+  [train] epoch 8 batch 350/2737  loss=0.2946  0.4 batches/sec
+  [train] epoch 8 batch 400/2737  loss=0.1231  0.4 batches/sec
+  [train] epoch 8 batch 450/2737  loss=0.1893  0.4 batches/sec
+  [train] epoch 8 batch 500/2737  loss=0.0883  0.4 batches/sec
+  [train] epoch 8 batch 550/2737  loss=0.0978  0.4 batches/sec
+  [train] epoch 8 batch 600/2737  loss=0.1397  0.4 batches/sec
+  [train] epoch 8 batch 650/2737  loss=0.0740  0.4 batches/sec
+  [train] epoch 8 batch 700/2737  loss=0.0466  0.4 batches/sec
+  [train] epoch 8 batch 750/2737  loss=0.2021  0.4 batches/sec
+  [train] epoch 8 batch 800/2737  loss=0.1941  0.4 batches/sec
+  [train] epoch 8 batch 850/2737  loss=0.1366  0.4 batches/sec
+  [train] epoch 8 batch 900/2737  loss=0.0433  0.4 batches/sec
+  [train] epoch 8 batch 950/2737  loss=0.1425  0.4 batches/sec
+  [train] epoch 8 batch 1000/2737  loss=0.1980  0.4 batches/sec
+  [train] epoch 8 batch 1050/2737  loss=0.1144  0.4 batches/sec
+  [train] epoch 8 batch 1100/2737  loss=0.1117  0.4 batches/sec
+  [train] epoch 8 batch 1150/2737  loss=0.3122  0.4 batches/sec
+  [train] epoch 8 batch 1200/2737  loss=0.0521  0.4 batches/sec
+  [train] epoch 8 batch 1250/2737  loss=0.0493  0.4 batches/sec
+  [train] epoch 8 batch 1300/2737  loss=0.1664  0.4 batches/sec
+  [train] epoch 8 batch 1350/2737  loss=0.0566  0.4 batches/sec
+  [train] epoch 8 batch 1400/2737  loss=0.1100  0.4 batches/sec
+  [train] epoch 8 batch 1450/2737  loss=0.0817  0.4 batches/sec
+  [train] epoch 8 batch 1500/2737  loss=0.1764  0.4 batches/sec
+  [train] epoch 8 batch 1550/2737  loss=0.0746  0.4 batches/sec
+  [train] epoch 8 batch 1600/2737  loss=0.2164  0.4 batches/sec
+  [train] epoch 8 batch 1650/2737  loss=0.0686  0.4 batches/sec
+  [train] epoch 8 batch 1700/2737  loss=0.1605  0.4 batches/sec
+  [train] epoch 8 batch 1750/2737  loss=0.1446  0.4 batches/sec
+  [train] epoch 8 batch 1800/2737  loss=0.5482  0.4 batches/sec
+  [train] epoch 8 batch 1850/2737  loss=0.1454  0.4 batches/sec
+  [train] epoch 8 batch 1900/2737  loss=0.0273  0.4 batches/sec
+  [train] epoch 8 batch 1950/2737  loss=0.0447  0.4 batches/sec
+  [train] epoch 8 batch 2000/2737  loss=0.0382  0.4 batches/sec
+  [train] epoch 8 batch 2050/2737  loss=0.3488  0.4 batches/sec
+  [train] epoch 8 batch 2100/2737  loss=0.1571  0.4 batches/sec
+  [train] epoch 8 batch 2150/2737  loss=0.1480  0.4 batches/sec
+  [train] epoch 8 batch 2200/2737  loss=0.1267  0.4 batches/sec
+  [train] epoch 8 batch 2250/2737  loss=0.0735  0.4 batches/sec
+  [train] epoch 8 batch 2300/2737  loss=0.1538  0.4 batches/sec
+  [train] epoch 8 batch 2350/2737  loss=0.1511  0.4 batches/sec
+  [train] epoch 8 batch 2400/2737  loss=0.1818  0.4 batches/sec
+  [train] epoch 8 batch 2450/2737  loss=0.7577  0.4 batches/sec
+  [train] epoch 8 batch 2500/2737  loss=0.1351  0.4 batches/sec
+  [train] epoch 8 batch 2550/2737  loss=0.2113  0.4 batches/sec
+  [train] epoch 8 batch 2600/2737  loss=0.0993  0.4 batches/sec
+  [train] epoch 8 batch 2650/2737  loss=0.2325  0.4 batches/sec
+  [train] epoch 8 batch 2700/2737  loss=0.1924  0.4 batches/sec
+  [val]   epoch 8 batch 0/586
+  [val]   epoch 8 batch 100/586
+  [val]   epoch 8 batch 200/586
+  [val]   epoch 8 batch 300/586
+  [val]   epoch 8 batch 400/586
+  [val]   epoch 8 batch 500/586
+Epoch   8 | Loss: 0.1662 | Val EER: 0.0620 | LR: 1.00e-04 | Batches/sec: 0.4 | Mean label: 0.599
+  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training
+  ✅ New best EER: 0.0620 — saved best.pt
+  [train] epoch 9 batch 0/2737  loss=0.0836  0.3 batches/sec
+  [train] epoch 9 batch 50/2737  loss=0.1379  0.4 batches/sec
+  [train] epoch 9 batch 100/2737  loss=0.0672  0.4 batches/sec
+  [train] epoch 9 batch 150/2737  loss=0.2572  0.4 batches/sec
+  [train] epoch 9 batch 200/2737  loss=0.1461  0.4 batches/sec
+  [train] epoch 9 batch 250/2737  loss=0.0781  0.4 batches/sec
+  [train] epoch 9 batch 300/2737  loss=0.4365  0.4 batches/sec
+  [train] epoch 9 batch 350/2737  loss=0.0390  0.4 batches/sec
+  [train] epoch 9 batch 400/2737  loss=0.2610  0.4 batches/sec
+  [train] epoch 9 batch 450/2737  loss=0.0872  0.4 batches/sec
+  [train] epoch 9 batch 500/2737  loss=0.1517  0.4 batches/sec
+  [train] epoch 9 batch 550/2737  loss=0.1251  0.4 batches/sec
+  [train] epoch 9 batch 600/2737  loss=0.0846  0.4 batches/sec
+  [train] epoch 9 batch 650/2737  loss=0.2805  0.4 batches/sec
+  [train] epoch 9 batch 700/2737  loss=0.1088  0.4 batches/sec
+  [train] epoch 9 batch 750/2737  loss=0.0879  0.4 batches/sec
+  [train] epoch 9 batch 800/2737  loss=0.1010  0.4 batches/sec
+  [train] epoch 9 batch 850/2737  loss=0.3041  0.4 batches/sec
+  [train] epoch 9 batch 900/2737  loss=0.0512  0.4 batches/sec
+  [train] epoch 9 batch 950/2737  loss=0.2859  0.4 batches/sec
+  [train] epoch 9 batch 1000/2737  loss=0.3088  0.4 batches/sec
+  [train] epoch 9 batch 1050/2737  loss=0.1719  0.4 batches/sec
+  [train] epoch 9 batch 1100/2737  loss=0.0617  0.4 batches/sec
+  [train] epoch 9 batch 1150/2737  loss=0.2140  0.4 batches/sec
+  [train] epoch 9 batch 1200/2737  loss=0.1636  0.4 batches/sec
+  [train] epoch 9 batch 1250/2737  loss=0.0451  0.4 batches/sec
+  [train] epoch 9 batch 1300/2737  loss=0.1297  0.4 batches/sec
+  [train] epoch 9 batch 1350/2737  loss=0.1068  0.4 batches/sec
+  [train] epoch 9 batch 1400/2737  loss=0.0815  0.4 batches/sec
+  [train] epoch 9 batch 1450/2737  loss=0.0921  0.4 batches/sec
+  [train] epoch 9 batch 1500/2737  loss=0.0345  0.4 batches/sec
+  [train] epoch 9 batch 1550/2737  loss=0.2750  0.4 batches/sec
+  [train] epoch 9 batch 1600/2737  loss=0.1669  0.4 batches/sec
+  [train] epoch 9 batch 1650/2737  loss=0.1781  0.4 batches/sec
+  [train] epoch 9 batch 1700/2737  loss=0.1789  0.4 batches/sec
+  [train] epoch 9 batch 1750/2737  loss=0.1421  0.4 batches/sec
+  [train] epoch 9 batch 1800/2737  loss=0.2106  0.4 batches/sec
+  [train] epoch 9 batch 1850/2737  loss=0.1676  0.4 batches/sec
+  [train] epoch 9 batch 1900/2737  loss=0.0638  0.4 batches/sec
+  [train] epoch 9 batch 1950/2737  loss=0.0395  0.4 batches/sec
+  [train] epoch 9 batch 2000/2737  loss=0.1610  0.4 batches/sec
+  [train] epoch 9 batch 2050/2737  loss=0.1674  0.4 batches/sec
+  [train] epoch 9 batch 2100/2737  loss=0.1186  0.4 batches/sec
+  [train] epoch 9 batch 2150/2737  loss=0.2670  0.4 batches/sec
+  [train] epoch 9 batch 2200/2737  loss=0.1242  0.4 batches/sec
+  [train] epoch 9 batch 2250/2737  loss=0.3657  0.4 batches/sec
+  [train] epoch 9 batch 2300/2737  loss=0.1668  0.4 batches/sec
+  [train] epoch 9 batch 2350/2737  loss=0.2470  0.4 batches/sec
+  [train] epoch 9 batch 2400/2737  loss=0.1646  0.4 batches/sec
+  [train] epoch 9 batch 2450/2737  loss=0.1176  0.4 batches/sec
+  [train] epoch 9 batch 2500/2737  loss=0.2091  0.4 batches/sec
+  [train] epoch 9 batch 2550/2737  loss=0.1492  0.4 batches/sec
+  [train] epoch 9 batch 2600/2737  loss=0.2883  0.4 batches/sec
+  [train] epoch 9 batch 2650/2737  loss=0.1614  0.4 batches/sec
+  [train] epoch 9 batch 2700/2737  loss=0.0551  0.4 batches/sec
+  [val]   epoch 9 batch 0/586
+  [val]   epoch 9 batch 100/586
+  [val]   epoch 9 batch 200/586
+  [val]   epoch 9 batch 300/586
+  [val]   epoch 9 batch 400/586
+  [val]   epoch 9 batch 500/586
+Epoch   9 | Loss: 0.1645 | Val EER: 0.0661 | LR: 1.00e-04 | Batches/sec: 0.4 | Mean label: 0.599
+  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training
+  [train] epoch 10 batch 0/2737  loss=0.1139  0.3 batches/sec
+  [train] epoch 10 batch 50/2737  loss=0.1977  0.4 batches/sec
+  [train] epoch 10 batch 100/2737  loss=0.1495  0.4 batches/sec
+  [train] epoch 10 batch 150/2737  loss=0.1608  0.4 batches/sec
+  [train] epoch 10 batch 200/2737  loss=0.1221  0.4 batches/sec
+  [train] epoch 10 batch 250/2737  loss=0.1747  0.4 batches/sec
+  [train] epoch 10 batch 300/2737  loss=0.1173  0.4 batches/sec
+  [train] epoch 10 batch 350/2737  loss=0.0819  0.4 batches/sec
+  [train] epoch 10 batch 400/2737  loss=0.1068  0.4 batches/sec
+  [train] epoch 10 batch 450/2737  loss=0.1202  0.4 batches/sec
+  [train] epoch 10 batch 500/2737  loss=0.0804  0.4 batches/sec
+  [train] epoch 10 batch 550/2737  loss=0.3056  0.4 batches/sec
+  [train] epoch 10 batch 600/2737  loss=0.0842  0.4 batches/sec
+  [train] epoch 10 batch 650/2737  loss=0.1621  0.4 batches/sec
+  [train] epoch 10 batch 700/2737  loss=0.0753  0.4 batches/sec
+  [train] epoch 10 batch 750/2737  loss=0.1830  0.4 batches/sec
+  [train] epoch 10 batch 800/2737  loss=0.2485  0.4 batches/sec
+  [train] epoch 10 batch 850/2737  loss=0.0613  0.4 batches/sec
+  [train] epoch 10 batch 900/2737  loss=0.1560  0.4 batches/sec
+  [train] epoch 10 batch 950/2737  loss=0.1025  0.4 batches/sec
+  [train] epoch 10 batch 1000/2737  loss=0.2110  0.4 batches/sec
+  [train] epoch 10 batch 1050/2737  loss=0.2354  0.4 batches/sec
+  [train] epoch 10 batch 1100/2737  loss=0.1216  0.4 batches/sec
+  [train] epoch 10 batch 1150/2737  loss=0.0771  0.4 batches/sec
+  [train] epoch 10 batch 1200/2737  loss=0.2578  0.4 batches/sec
+  [train] epoch 10 batch 1250/2737  loss=0.0516  0.4 batches/sec
+  [train] epoch 10 batch 1300/2737  loss=0.2739  0.4 batches/sec
+  [train] epoch 10 batch 1350/2737  loss=0.3643  0.4 batches/sec
+  [train] epoch 10 batch 1400/2737  loss=0.1828  0.4 batches/sec
+  [train] epoch 10 batch 1450/2737  loss=0.0998  0.4 batches/sec
+  [train] epoch 10 batch 1500/2737  loss=0.1790  0.4 batches/sec
+  [train] epoch 10 batch 1550/2737  loss=0.0973  0.4 batches/sec
+  [train] epoch 10 batch 1600/2737  loss=0.2447  0.4 batches/sec
+  [train] epoch 10 batch 1650/2737  loss=0.0623  0.4 batches/sec
+  [train] epoch 10 batch 1700/2737  loss=0.1044  0.4 batches/sec
+  [train] epoch 10 batch 1750/2737  loss=0.0678  0.4 batches/sec
+  [train] epoch 10 batch 1800/2737  loss=0.1317  0.4 batches/sec
+  [train] epoch 10 batch 1850/2737  loss=0.2707  0.4 batches/sec
+  [train] epoch 10 batch 1900/2737  loss=0.1241  0.4 batches/sec
+  [train] epoch 10 batch 1950/2737  loss=0.1129  0.4 batches/sec
+  [train] epoch 10 batch 2000/2737  loss=0.1730  0.4 batches/sec
+  [train] epoch 10 batch 2050/2737  loss=0.0754  0.4 batches/sec
+  [train] epoch 10 batch 2100/2737  loss=0.1785  0.4 batches/sec
+  [train] epoch 10 batch 2150/2737  loss=0.1433  0.4 batches/sec
+  [train] epoch 10 batch 2200/2737  loss=0.1391  0.4 batches/sec
+  [train] epoch 10 batch 2250/2737  loss=0.1776  0.4 batches/sec
+  [train] epoch 10 batch 2300/2737  loss=0.2825  0.4 batches/sec
+  [train] epoch 10 batch 2350/2737  loss=0.2211  0.4 batches/sec
+  [train] epoch 10 batch 2400/2737  loss=0.1058  0.4 batches/sec
+  [train] epoch 10 batch 2450/2737  loss=0.1605  0.4 batches/sec
+  [train] epoch 10 batch 2500/2737  loss=0.2230  0.4 batches/sec
+  [train] epoch 10 batch 2550/2737  loss=0.1618  0.4 batches/sec
+  [train] epoch 10 batch 2600/2737  loss=0.0321  0.4 batches/sec
+  [train] epoch 10 batch 2650/2737  loss=0.1346  0.4 batches/sec
+  [train] epoch 10 batch 2700/2737  loss=0.2591  0.4 batches/sec
+  [val]   epoch 10 batch 0/586
+  [val]   epoch 10 batch 100/586
+  [val]   epoch 10 batch 200/586
+  [val]   epoch 10 batch 300/586
+  [val]   epoch 10 batch 400/586
+  [val]   epoch 10 batch 500/586
+Epoch  10 | Loss: 0.1626 | Val EER: 0.0604 | LR: 1.00e-04 | Batches/sec: 0.4 | Mean label: 0.599
+  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training
+  ✅ New best EER: 0.0604 — saved best.pt
+
+Training complete. Best val EER: 0.0604
+Checkpoints saved to: /kaggle/working/checkpoints/B1
+
+
+SOURCE: B1_artifacts.zip / training.log
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:300: SyntaxWarning: invalid escape sequence '\('
+  m = re.match('([su]([0-9]{1,2})p?) \(([0-9]{1,2}) bit\)$', token)
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:301: SyntaxWarning: invalid escape sequence '\('
+  m2 = re.match('([su]([0-9]{1,2})p?)( \(default\))?$', token)
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:310: SyntaxWarning: invalid escape sequence '\('
+  elif re.match('(flt)p?( \(default\))?$', token):
+/usr/local/lib/python3.12/dist-packages/pydub/utils.py:314: SyntaxWarning: invalid escape sequence '\('
+  elif re.match('(dbl)p?( \(default\))?$', token):
+[init] device=cuda
+[init] augment=none augment_prob=0.5 aug_seed=42 (independent of the manifest train/val/test split seed, which is fixed at manifest-generation time and unaffected by this flag)
+[init] reading manifest …
+[init] train_ds=87585 samples
+[init] val_ds=18769 samples
+[init] loaders ready — 2737 train batches, 586 val batches
+[init] building model (setup=B, fusion=attention, features=lfcc) …
+[init] moving model to cuda …
+[init] model ready
+Resumed from /kaggle/working/checkpoints/B1/best.pt (epoch 3)
+  [train] epoch 4 batch 0/2737  loss=0.3751  0.2 batches/sec
+  [train] epoch 4 batch 50/2737  loss=0.2332  0.4 batches/sec
+  [train] epoch 4 batch 100/2737  loss=0.1056  0.4 batches/sec
+  [train] epoch 4 batch 150/2737  loss=0.1608  0.4 batches/sec
+  [train] epoch 4 batch 200/2737  loss=0.0535  0.4 batches/sec
+  [train] epoch 4 batch 250/2737  loss=0.1097  0.4 batches/sec
+  [train] epoch 4 batch 300/2737  loss=0.2834  0.4 batches/sec
+  [train] epoch 4 batch 350/2737  loss=0.1005  0.4 batches/sec
+  [train] epoch 4 batch 400/2737  loss=0.0487  0.4 batches/sec
+  [train] epoch 4 batch 450/2737  loss=0.0935  0.4 batches/sec
+  [train] epoch 4 batch 500/2737  loss=0.2323  0.4 batches/sec
+  [train] epoch 4 batch 550/2737  loss=0.1498  0.4 batches/sec
+  [train] epoch 4 batch 600/2737  loss=0.1479  0.4 batches/sec
+  [train] epoch 4 batch 650/2737  loss=0.1402  0.4 batches/sec
+  [train] epoch 4 batch 700/2737  loss=0.3232  0.4 batches/sec
+  [train] epoch 4 batch 750/2737  loss=0.2270  0.4 batches/sec
+  [train] epoch 4 batch 800/2737  loss=0.1046  0.4 batches/sec
+  [train] epoch 4 batch 850/2737  loss=0.0963  0.4 batches/sec
+  [train] epoch 4 batch 900/2737  loss=0.1819  0.4 batches/sec
+  [train] epoch 4 batch 950/2737  loss=0.0983  0.4 batches/sec
+  [train] epoch 4 batch 1000/2737  loss=0.1743  0.4 batches/sec
+  [train] epoch 4 batch 1050/2737  loss=0.1161  0.4 batches/sec
+  [train] epoch 4 batch 1100/2737  loss=0.1201  0.4 batches/sec
+  [train] epoch 4 batch 1150/2737  loss=0.1522  0.4 batches/sec
+  [train] epoch 4 batch 1200/2737  loss=0.0747  0.4 batches/sec
+  [train] epoch 4 batch 1250/2737  loss=0.2523  0.4 batches/sec
+  [train] epoch 4 batch 1300/2737  loss=0.2095  0.4 batches/sec
+  [train] epoch 4 batch 1350/2737  loss=0.2914  0.4 batches/sec
+  [train] epoch 4 batch 1400/2737  loss=0.0798  0.4 batches/sec
+  [train] epoch 4 batch 1450/2737  loss=0.3408  0.4 batches/sec
+  [train] epoch 4 batch 1500/2737  loss=0.1898  0.4 batches/sec
+  [train] epoch 4 batch 1550/2737  loss=0.4573  0.4 batches/sec
+  [train] epoch 4 batch 1600/2737  loss=0.0660  0.4 batches/sec
+  [train] epoch 4 batch 1650/2737  loss=0.2550  0.4 batches/sec
+  [train] epoch 4 batch 1700/2737  loss=0.1690  0.4 batches/sec
+  [train] epoch 4 batch 1750/2737  loss=0.2901  0.4 batches/sec
+  [train] epoch 4 batch 1800/2737  loss=0.2720  0.4 batches/sec
+  [train] epoch 4 batch 1850/2737  loss=0.0505  0.4 batches/sec
+  [train] epoch 4 batch 1900/2737  loss=0.1763  0.4 batches/sec
+  [train] epoch 4 batch 1950/2737  loss=0.0378  0.4 batches/sec
+  [train] epoch 4 batch 2000/2737  loss=0.1263  0.4 batches/sec
+  [train] epoch 4 batch 2050/2737  loss=0.0354  0.4 batches/sec
+  [train] epoch 4 batch 2100/2737  loss=0.0422  0.4 batches/sec
+  [train] epoch 4 batch 2150/2737  loss=0.2449  0.4 batches/sec
+  [train] epoch 4 batch 2200/2737  loss=0.3305  0.4 batches/sec
+  [train] epoch 4 batch 2250/2737  loss=0.2340  0.4 batches/sec
+  [train] epoch 4 batch 2300/2737  loss=0.1473  0.4 batches/sec
+  [train] epoch 4 batch 2350/2737  loss=0.2356  0.4 batches/sec
+  [train] epoch 4 batch 2400/2737  loss=0.2710  0.4 batches/sec
+  [train] epoch 4 batch 2450/2737  loss=0.1800  0.4 batches/sec
+  [train] epoch 4 batch 2500/2737  loss=0.2510  0.4 batches/sec
+  [train] epoch 4 batch 2550/2737  loss=0.3465  0.4 batches/sec
+  [train] epoch 4 batch 2600/2737  loss=0.0841  0.4 batches/sec
+  [train] epoch 4 batch 2650/2737  loss=0.0780  0.4 batches/sec
+  [train] epoch 4 batch 2700/2737  loss=0.0286  0.4 batches/sec
+  [val]   epoch 4 batch 0/586
+  [val]   epoch 4 batch 100/586
+  [val]   epoch 4 batch 200/586
+  [val]   epoch 4 batch 300/586
+  [val]   epoch 4 batch 400/586
+  [val]   epoch 4 batch 500/586
+Epoch   4 | Loss: 0.1799 | Val EER: 0.0665 | LR: 1.00e-04 | Batches/sec: 0.4 | Mean label: 0.599
+  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training
+  [train] epoch 5 batch 0/2737  loss=0.2392  0.3 batches/sec
+  [train] epoch 5 batch 50/2737  loss=0.3148  0.4 batches/sec
+  [train] epoch 5 batch 100/2737  loss=0.1624  0.4 batches/sec
+  [train] epoch 5 batch 150/2737  loss=0.1004  0.4 batches/sec
+  [train] epoch 5 batch 200/2737  loss=0.1211  0.4 batches/sec
+  [train] epoch 5 batch 250/2737  loss=0.3186  0.4 batches/sec
+  [train] epoch 5 batch 300/2737  loss=0.1132  0.4 batches/sec
+  [train] epoch 5 batch 350/2737  loss=0.1450  0.4 batches/sec
+  [train] epoch 5 batch 400/2737  loss=0.1072  0.4 batches/sec
+  [train] epoch 5 batch 450/2737  loss=0.1753  0.4 batches/sec
+  [train] epoch 5 batch 500/2737  loss=0.1454  0.4 batches/sec
+  [train] epoch 5 batch 550/2737  loss=0.1149  0.4 batches/sec
+  [train] epoch 5 batch 600/2737  loss=0.2826  0.4 batches/sec
+  [train] epoch 5 batch 650/2737  loss=0.0467  0.4 batches/sec
+  [train] epoch 5 batch 700/2737  loss=0.2241  0.4 batches/sec
+  [train] epoch 5 batch 750/2737  loss=0.1586  0.4 batches/sec
+  [train] epoch 5 batch 800/2737  loss=0.1637  0.4 batches/sec
+  [train] epoch 5 batch 850/2737  loss=0.1163  0.4 batches/sec
+  [train] epoch 5 batch 900/2737  loss=0.0827  0.4 batches/sec
+  [train] epoch 5 batch 950/2737  loss=0.0990  0.4 batches/sec
+  [train] epoch 5 batch 1000/2737  loss=0.0761  0.4 batches/sec
+  [train] epoch 5 batch 1050/2737  loss=0.1023  0.4 batches/sec
+  [train] epoch 5 batch 1100/2737  loss=0.0838  0.4 batches/sec
+  [train] epoch 5 batch 1150/2737  loss=0.0517  0.4 batches/sec
+  [train] epoch 5 batch 1200/2737  loss=0.0369  0.4 batches/sec
+  [train] epoch 5 batch 1250/2737  loss=0.3153  0.4 batches/sec
+  [train] epoch 5 batch 1300/2737  loss=0.2375  0.4 batches/sec
+  [train] epoch 5 batch 1350/2737  loss=0.1878  0.4 batches/sec
+  [train] epoch 5 batch 1400/2737  loss=0.1443  0.4 batches/sec
+  [train] epoch 5 batch 1450/2737  loss=0.1023  0.4 batches/sec
+  [train] epoch 5 batch 1500/2737  loss=0.1135  0.4 batches/sec
+  [train] epoch 5 batch 1550/2737  loss=0.3193  0.4 batches/sec
+  [train] epoch 5 batch 1600/2737  loss=0.2235  0.4 batches/sec
+  [train] epoch 5 batch 1650/2737  loss=0.1929  0.4 batches/sec
+  [train] epoch 5 batch 1700/2737  loss=0.2096  0.4 batches/sec
+  [train] epoch 5 batch 1750/2737  loss=0.1563  0.4 batches/sec
+  [train] epoch 5 batch 1800/2737  loss=0.3291  0.4 batches/sec
+  [train] epoch 5 batch 1850/2737  loss=0.2045  0.4 batches/sec
+  [train] epoch 5 batch 1900/2737  loss=0.1756  0.4 batches/sec
+  [train] epoch 5 batch 1950/2737  loss=0.2974  0.4 batches/sec
+  [train] epoch 5 batch 2000/2737  loss=0.2788  0.4 batches/sec
+  [train] epoch 5 batch 2050/2737  loss=0.1179  0.4 batches/sec
+  [train] epoch 5 batch 2100/2737  loss=0.1358  0.4 batches/sec
+  [train] epoch 5 batch 2150/2737  loss=0.2204  0.4 batches/sec
+  [train] epoch 5 batch 2200/2737  loss=0.3321  0.4 batches/sec
+  [train] epoch 5 batch 2250/2737  loss=0.0726  0.4 batches/sec
+  [train] epoch 5 batch 2300/2737  loss=0.2686  0.4 batches/sec
+  [train] epoch 5 batch 2350/2737  loss=0.1545  0.4 batches/sec
+  [train] epoch 5 batch 2400/2737  loss=0.1936  0.4 batches/sec
+  [train] epoch 5 batch 2450/2737  loss=0.1470  0.4 batches/sec
+  [train] epoch 5 batch 2500/2737  loss=0.2039  0.4 batches/sec
+  [train] epoch 5 batch 2550/2737  loss=0.0473  0.4 batches/sec
+  [train] epoch 5 batch 2600/2737  loss=0.3530  0.4 batches/sec
+  [train] epoch 5 batch 2650/2737  loss=0.1245  0.4 batches/sec
+  [train] epoch 5 batch 2700/2737  loss=0.0710  0.4 batches/sec
+  [val]   epoch 5 batch 0/586
+  [val]   epoch 5 batch 100/586
+  [val]   epoch 5 batch 200/586
+  [val]   epoch 5 batch 300/586
+  [val]   epoch 5 batch 400/586
+  [val]   epoch 5 batch 500/586
+Epoch   5 | Loss: 0.1746 | Val EER: 0.0669 | LR: 1.00e-04 | Batches/sec: 0.4 | Mean label: 0.599
+  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training
+  [train] epoch 6 batch 0/2737  loss=0.2524  0.3 batches/sec
+  [train] epoch 6 batch 50/2737  loss=0.1795  0.4 batches/sec
+  [train] epoch 6 batch 100/2737  loss=0.2157  0.4 batches/sec
+  [train] epoch 6 batch 150/2737  loss=0.2319  0.4 batches/sec
+  [train] epoch 6 batch 200/2737  loss=0.1074  0.4 batches/sec
+  [train] epoch 6 batch 250/2737  loss=0.1810  0.4 batches/sec
+  [train] epoch 6 batch 300/2737  loss=0.1742  0.4 batches/sec
+  [train] epoch 6 batch 350/2737  loss=0.3056  0.4 batches/sec
+  [train] epoch 6 batch 400/2737  loss=0.2005  0.4 batches/sec
+  [train] epoch 6 batch 450/2737  loss=0.0474  0.4 batches/sec
+  [train] epoch 6 batch 500/2737  loss=0.1805  0.4 batches/sec
+  [train] epoch 6 batch 550/2737  loss=0.3558  0.4 batches/sec
+  [train] epoch 6 batch 600/2737  loss=0.1723  0.4 batches/sec
+  [train] epoch 6 batch 650/2737  loss=0.1231  0.4 batches/sec
+  [train] epoch 6 batch 700/2737  loss=0.4251  0.4 batches/sec
+  [train] epoch 6 batch 750/2737  loss=0.3080  0.4 batches/sec
+  [train] epoch 6 batch 800/2737  loss=0.1416  0.4 batches/sec
+  [train] epoch 6 batch 850/2737  loss=0.1236  0.4 batches/sec
+  [train] epoch 6 batch 900/2737  loss=0.2512  0.4 batches/sec
+  [train] epoch 6 batch 950/2737  loss=0.1034  0.4 batches/sec
+  [train] epoch 6 batch 1000/2737  loss=0.0698  0.4 batches/sec
+  [train] epoch 6 batch 1050/2737  loss=0.3162  0.4 batches/sec
+  [train] epoch 6 batch 1100/2737  loss=0.0983  0.4 batches/sec
+  [train] epoch 6 batch 1150/2737  loss=0.2056  0.4 batches/sec
+  [train] epoch 6 batch 1200/2737  loss=0.2631  0.4 batches/sec
+  [train] epoch 6 batch 1250/2737  loss=0.0436  0.4 batches/sec
+  [train] epoch 6 batch 1300/2737  loss=0.1795  0.4 batches/sec
+  [train] epoch 6 batch 1350/2737  loss=0.0962  0.4 batches/sec
+  [train] epoch 6 batch 1400/2737  loss=0.2414  0.4 batches/sec
+  [train] epoch 6 batch 1450/2737  loss=0.0442  0.4 batches/sec
+  [train] epoch 6 batch 1500/2737  loss=0.1285  0.4 batches/sec
+  [train] epoch 6 batch 1550/2737  loss=0.1690  0.4 batches/sec
+  [train] epoch 6 batch 1600/2737  loss=0.1645  0.4 batches/sec
+  [train] epoch 6 batch 1650/2737  loss=0.1868  0.4 batches/sec
+  [train] epoch 6 batch 1700/2737  loss=0.0816  0.4 batches/sec
+  [train] epoch 6 batch 1750/2737  loss=0.1380  0.4 batches/sec
+  [train] epoch 6 batch 1800/2737  loss=0.0763  0.4 batches/sec
+  [train] epoch 6 batch 1850/2737  loss=0.3220  0.4 batches/sec
+  [train] epoch 6 batch 1900/2737  loss=0.2281  0.4 batches/sec
+  [train] epoch 6 batch 1950/2737  loss=0.1526  0.4 batches/sec
+  [train] epoch 6 batch 2000/2737  loss=0.1620  0.4 batches/sec
+  [train] epoch 6 batch 2050/2737  loss=0.1388  0.4 batches/sec
+  [train] epoch 6 batch 2100/2737  loss=0.1638  0.4 batches/sec
+  [train] epoch 6 batch 2150/2737  loss=0.1524  0.4 batches/sec
+  [train] epoch 6 batch 2200/2737  loss=0.2155  0.4 batches/sec
+  [train] epoch 6 batch 2250/2737  loss=0.0411  0.4 batches/sec
+  [train] epoch 6 batch 2300/2737  loss=0.1001  0.4 batches/sec
+  [train] epoch 6 batch 2350/2737  loss=0.1941  0.4 batches/sec
+  [train] epoch 6 batch 2400/2737  loss=0.1639  0.4 batches/sec
+  [train] epoch 6 batch 2450/2737  loss=0.1578  0.4 batches/sec
+  [train] epoch 6 batch 2500/2737  loss=0.2304  0.4 batches/sec
+  [train] epoch 6 batch 2550/2737  loss=0.1072  0.4 batches/sec
+  [train] epoch 6 batch 2600/2737  loss=0.1047  0.4 batches/sec
+  [train] epoch 6 batch 2650/2737  loss=0.1028  0.4 batches/sec
+  [train] epoch 6 batch 2700/2737  loss=0.2359  0.4 batches/sec
+  [val]   epoch 6 batch 0/586
+  [val]   epoch 6 batch 100/586
+  [val]   epoch 6 batch 200/586
+  [val]   epoch 6 batch 300/586
+  [val]   epoch 6 batch 400/586
+  [val]   epoch 6 batch 500/586
+Epoch   6 | Loss: 0.1727 | Val EER: 0.0664 | LR: 1.00e-04 | Batches/sec: 0.4 | Mean label: 0.599
+  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training
+  ✅ New best EER: 0.0664 — saved best.pt
+  [train] epoch 7 batch 0/2737  loss=0.0252  0.3 batches/sec
+  [train] epoch 7 batch 50/2737  loss=0.0882  0.4 batches/sec
+  [train] epoch 7 batch 100/2737  loss=0.1443  0.4 batches/sec
+  [train] epoch 7 batch 150/2737  loss=0.0516  0.4 batches/sec
+  [train] epoch 7 batch 200/2737  loss=0.1840  0.4 batches/sec
+  [train] epoch 7 batch 250/2737  loss=0.1193  0.4 batches/sec
+  [train] epoch 7 batch 300/2737  loss=0.0710  0.4 batches/sec
+  [train] epoch 7 batch 350/2737  loss=0.3065  0.4 batches/sec
+  [train] epoch 7 batch 400/2737  loss=0.0946  0.4 batches/sec
+  [train] epoch 7 batch 450/2737  loss=0.1500  0.4 batches/sec
+  [train] epoch 7 batch 500/2737  loss=0.1454  0.4 batches/sec
+  [train] epoch 7 batch 550/2737  loss=0.2424  0.4 batches/sec
+  [train] epoch 7 batch 600/2737  loss=0.0460  0.4 batches/sec
+  [train] epoch 7 batch 650/2737  loss=0.2504  0.4 batches/sec
+  [train] epoch 7 batch 700/2737  loss=0.5691  0.4 batches/sec
+  [train] epoch 7 batch 750/2737  loss=0.1489  0.4 batches/sec
+  [train] epoch 7 batch 800/2737  loss=0.1554  0.4 batches/sec
+  [train] epoch 7 batch 850/2737  loss=0.0634  0.4 batches/sec
+  [train] epoch 7 batch 900/2737  loss=0.1218  0.4 batches/sec
+  [train] epoch 7 batch 950/2737  loss=0.3422  0.4 batches/sec
+  [train] epoch 7 batch 1000/2737  loss=0.1489  0.4 batches/sec
+  [train] epoch 7 batch 1050/2737  loss=0.0926  0.4 batches/sec
+  [train] epoch 7 batch 1100/2737  loss=0.1903  0.4 batches/sec
+  [train] epoch 7 batch 1150/2737  loss=0.1594  0.4 batches/sec
+  [train] epoch 7 batch 1200/2737  loss=0.1292  0.4 batches/sec
+  [train] epoch 7 batch 1250/2737  loss=0.2426  0.4 batches/sec
+  [train] epoch 7 batch 1300/2737  loss=0.2833  0.4 batches/sec
+  [train] epoch 7 batch 1350/2737  loss=0.0577  0.4 batches/sec
+  [train] epoch 7 batch 1400/2737  loss=0.2362  0.4 batches/sec
+  [train] epoch 7 batch 1450/2737  loss=0.0389  0.4 batches/sec
+  [train] epoch 7 batch 1500/2737  loss=0.2279  0.4 batches/sec
+  [train] epoch 7 batch 1550/2737  loss=0.3163  0.4 batches/sec
+  [train] epoch 7 batch 1600/2737  loss=0.2734  0.4 batches/sec
+  [train] epoch 7 batch 1650/2737  loss=0.3718  0.4 batches/sec
+  [train] epoch 7 batch 1700/2737  loss=0.0979  0.4 batches/sec
+  [train] epoch 7 batch 1750/2737  loss=0.3402  0.4 batches/sec
+  [train] epoch 7 batch 1800/2737  loss=0.2238  0.4 batches/sec
+  [train] epoch 7 batch 1850/2737  loss=0.1446  0.4 batches/sec
+  [train] epoch 7 batch 1900/2737  loss=0.1899  0.4 batches/sec
+  [train] epoch 7 batch 1950/2737  loss=0.2578  0.4 batches/sec
+  [train] epoch 7 batch 2000/2737  loss=0.2320  0.4 batches/sec
+  [train] epoch 7 batch 2050/2737  loss=0.1817  0.4 batches/sec
+  [train] epoch 7 batch 2100/2737  loss=0.0823  0.4 batches/sec
+  [train] epoch 7 batch 2150/2737  loss=0.1449  0.4 batches/sec
+  [train] epoch 7 batch 2200/2737  loss=0.1769  0.4 batches/sec
+  [train] epoch 7 batch 2250/2737  loss=0.2037  0.4 batches/sec
+  [train] epoch 7 batch 2300/2737  loss=0.2467  0.4 batches/sec
+  [train] epoch 7 batch 2350/2737  loss=0.4964  0.4 batches/sec
+  [train] epoch 7 batch 2400/2737  loss=0.0423  0.4 batches/sec
+  [train] epoch 7 batch 2450/2737  loss=0.1243  0.4 batches/sec
+  [train] epoch 7 batch 2500/2737  loss=0.2618  0.4 batches/sec
+  [train] epoch 7 batch 2550/2737  loss=0.1766  0.4 batches/sec
+  [train] epoch 7 batch 2600/2737  loss=0.1228  0.4 batches/sec
+  [train] epoch 7 batch 2650/2737  loss=0.1617  0.4 batches/sec
+  [train] epoch 7 batch 2700/2737  loss=0.1848  0.4 batches/sec
+  [val]   epoch 7 batch 0/586
+  [val]   epoch 7 batch 100/586
+  [val]   epoch 7 batch 200/586
+  [val]   epoch 7 batch 300/586
+  [val]   epoch 7 batch 400/586
+  [val]   epoch 7 batch 500/586
+Epoch   7 | Loss: 0.1685 | Val EER: 0.0663 | LR: 1.00e-04 | Batches/sec: 0.4 | Mean label: 0.599
+  ⚠️  WARNING: < 1 batch/sec — check that SSD copy ran before training
+  ✅ New best EER: 0.0663 — saved best.pt
+  [train] epoch 8 batch 0/2737  loss=0.1042  0.3 batches/sec
+  [train] epoch 8 batch 50/2737  loss=0.1558  0.4 batches/sec
+  [train] epoch 8 batch 100/2737  loss=0.0616  0.4 batches/sec
+  [train] epoch 8 batch 150/2737  loss=0.3329  0.4 batches/sec
+  [train] epoch 8 batch 200/2737  loss=0.3426  0.4 batches/sec
+  [train] epoch 8 batch 250/2737  loss=0.1841  0.4 batches/sec
+  [train] epoch 8 batch 300/2737  loss=0.1673  0.4 batches/sec
+  [train] epoch 8 batch 350/2737  loss=0.3694  0.4 batches/sec
+  [train] epoch 8 batch 400/2737  loss=0.0556  0.4 batches/sec

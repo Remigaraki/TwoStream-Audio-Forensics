@@ -31,6 +31,7 @@ ROOT = Path(os.environ.get("DEMO_ASSET_ROOT", DEMO_DIR.parent))
 sys.path.insert(0, str(DEMO_DIR.parent))
 
 from src.fusion.two_stream_net import TwoStreamFusionNet  # noqa: E402
+from demo.artifact_identity import model_identity, verify_reports  # noqa: E402
 
 TARGET_SR = 16000
 TARGET_LEN = 64000                      # 4 s, as in _ManifestDataset
@@ -118,6 +119,16 @@ def load_thresholds() -> dict:
         t = data[name]
         if not (0.0 <= float(t["threshold"]) <= 1.0) or t["status"] not in ("provisional", "validation"):
             raise AssetError(f"Invalid threshold entry for {name} in {THRESHOLDS_PATH.name}")
+        if t['status'] == 'validation':
+            current = model_identity(name, MODELS[name])
+            if t.get('provenance', {}).get('identity') != current:
+                raise AssetError(f'{name} threshold preprocessing/checkpoint/PCA identity mismatch')
+            reports_path = THRESHOLDS_PATH.with_suffix('.verification.json')
+            try:
+                reports = json.loads(reports_path.read_text(encoding='utf-8'))
+                verify_reports(THRESHOLDS_PATH, reports, {name: current})
+            except (OSError, ValueError) as exc:
+                raise AssetError(f'{name} threshold is not parity verified: {exc}') from exc
     return data
 
 

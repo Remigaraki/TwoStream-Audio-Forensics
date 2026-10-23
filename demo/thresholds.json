@@ -1,12 +1,215 @@
 {
   "C1": {
-    "threshold": 0.5,
-    "status": "provisional",
-    "source": "Uncalibrated default of 0.5. Not derived from any data; not a validated operating point. Replace by running demo/calibrate_threshold.py on the validation split."
+    "threshold": 0.5611329463887028,
+    "status": "validation",
+    "source": "equal-error-rate operating point on the clean validation split (18769 utterances) of the evaluated manifest.",
+    "provenance": {
+      "split": "val",
+      "manifest_split_hash": "ed4808bb0456de26",
+      "operating_point": "eer",
+      "n_bonafide": 7520,
+      "n_spoof": 11249,
+      "val_miss_at_threshold": 0.008377659574468085,
+      "val_false_alarm_at_threshold": 0.008445195128455863,
+      "val_eer": 0.008445195128455799,
+      "val_eer_threshold": 0.5611329463887028,
+      "val_eer_traintime_impl": 0.008477916713164103,
+      "val_min_dcf": 0.021129585041129016,
+      "val_min_dcf_threshold": 0.8605303764343262,
+      "dcf_params": {
+        "pi_spoof": 0.05,
+        "c_miss": 1.0,
+        "c_fa": 10.0
+      },
+      "checkpoint_logged_val_eer": 0.008633686177779123,
+      "checkpoint": "checkpoints/setup_c/best_c1_attention.pt",
+      "checkpoint_sha256": "3047175ddc1b2f35ed7f31541c24870f3adffdf5099a0f5dc257f651dc3a930d",
+      "codec_check_val": {
+        "opus_16": {
+          "miss": 0.02021276595744681,
+          "false_alarm": 0.025068895012890034,
+          "dcf_at_threshold": 0.06347315033203897,
+          "min_dcf": 0.058938993158729844,
+          "val_eer": 0.02231309449728857
+        },
+        "opus_32": {
+          "miss": 0.007047872340425532,
+          "false_alarm": 0.016001422348653215,
+          "dcf_at_threshold": 0.029392379795461724,
+          "min_dcf": 0.02877010225968087,
+          "val_eer": 0.01191216997090554
+        },
+        "opus_64": {
+          "miss": 0.0067819148936170215,
+          "false_alarm": 0.010312027735798738,
+          "dcf_at_threshold": 0.02319766603367108,
+          "min_dcf": 0.021297954617242557,
+          "val_eer": 0.008800782291759422
+        },
+        "mp3_64": {
+          "miss": 0.04188829787234043,
+          "false_alarm": 0.008711885500933417,
+          "dcf_at_threshold": 0.08829965145838023,
+          "min_dcf": 0.045164702583492096,
+          "val_eer": 0.01697928704773729
+        },
+        "mp3_128": {
+          "miss": 0.038829787234042554,
+          "false_alarm": 0.008178504755978309,
+          "dcf_at_threshold": 0.08195510050065916,
+          "min_dcf": 0.043620788750962244,
+          "val_eer": 0.015425531915174361
+        },
+        "aac_128": {
+          "miss": 0.009840425531914894,
+          "false_alarm": 0.008711885500933417,
+          "dcf_at_threshold": 0.027408694011571713,
+          "min_dcf": 0.022224408127058053,
+          "val_eer": 0.009245266245887979
+        }
+      },
+      "git_commit": "57c5b1d46dbe64a0fe0701873da683a3358f8972",
+      "torch": "2.11.0+cu128",
+      "device": "cuda",
+      "created_utc": "2026-10-06T14:07:29+00:00",
+      "identity": {
+        "schema": 1,
+        "model": "C1",
+        "checkpoint_sha256": "3047175ddc1b2f35ed7f31541c24870f3adffdf5099a0f5dc257f651dc3a930d",
+        "pca_sha256": "224766ac0d971c36439d2b1c3b7d6ede5c16d7e9567762fd738710dc11978c31",
+        "runtime": {
+          "torch": "2.11.0",
+          "torchaudio": "2.11.0",
+          "numpy": "2.3.5",
+          "scipy": "1.16.3",
+          "scikit-learn": "1.8.0",
+          "soundfile": "0.13.1"
+        },
+        "sources": {
+          "demo/inference.py": "92d078c95a95bfb9f705cc9b1a827fe9803f74ed14877a34e116e73d86b5376f",
+          "demo/decode.py": "d09c9c22d2b2f6c4035ab9acfd5e9c23a9219ac09f515e4b59de2110c31a646b",
+          "demo/artifact_identity.py": "7c3e847e80b68be235896640c4ab6a31b3bc7b6f6c267158f1c1b4aec7c26434",
+          "demo/check_parity.py": "87af62fafea01e1e64df5a317d15660d18562f4b99b8a377083ef511de5962a1",
+          "src/train.py": "afaa4489766af28159e3173250f8d00a217898bd0bfda2fd6186d9c644c80aa0",
+          "src/pipeline/augment.py": "f957e7c33cd65316f10f6ef78ff4c1023bd1530055c331dde0be4d8e241eabca",
+          "src/fusion/two_stream_net.py": "dd70e9d4f7247abf21d453910205b618af7f0cafdccaeeae7a00b07225629ae9",
+          "src/fusion/attention_fusion.py": "9b6811dfc2cdb11068b77ca20a2fe37e8f05a3b0e8c47e71fb4cb640c0a75b87",
+          "src/stream1/rawnet2.py": "377de57a55f4adab7b5dc19e00f8f828254920f55302e74a638e040250bdc772",
+          "src/stream1/sinc_conv.py": "09bcdc235bc05b8b423a63988ddda3b297720049f5cae3c3de6c3033d41e35d7",
+          "src/stream2/lfcc.py": "fb77a9d19bfb79f0b0c53bd403b54452cc7924317701a6d10cb9333d1ad0d500",
+          "src/stream2/stream2.py": "e57f9cb43fd5bfddf482b2c74592221796592b309b4bc92a4e7ef5ff5ea8f036",
+          "src/stream2/bispectrum.py": "b4384a03e02a2fbf5abb717fabd8dd9d687a58da2c7d40a69f38fec218cd3d58",
+          "src/stream2/pca_compressor.py": "4ae3fdc4c745226b02e1b7827fce30104d527391c3e085be00f165f3f6232c99",
+          "src/stream2/mlp.py": "504e89c37c7799bd5394871233a62d1bda4dcbc746c1c8f4ec6f451d4d7ab3c1"
+        }
+      },
+      "identity_binding": "Staged against current source; legacy source provenance incomplete; parity and clean-cache agreement required.",
+      "backup_content_sha256": "d9bda132d85bc50a68f0d3232833b41f4625c055cc534020e5c3cdaee2ec0a3b",
+      "clean_cache_sha256": "ca587cf131bdfa475412b7224df381d23b7d91f246e403d9e4c5e74297384a8a"
+    }
   },
   "A1": {
-    "threshold": 0.5,
-    "status": "provisional",
-    "source": "Uncalibrated default of 0.5. Not derived from any data; not a validated operating point. Replace by running demo/calibrate_threshold.py on the validation split."
+    "threshold": 0.9232435226438108,
+    "status": "validation",
+    "source": "equal-error-rate operating point on the clean validation split (18769 utterances) of the evaluated manifest.",
+    "provenance": {
+      "split": "val",
+      "manifest_split_hash": "ed4808bb0456de26",
+      "operating_point": "eer",
+      "n_bonafide": 7520,
+      "n_spoof": 11249,
+      "val_miss_at_threshold": 0.01050531914893617,
+      "val_false_alarm_at_threshold": 0.01048982131745044,
+      "val_eer": 0.01050531914902199,
+      "val_eer_threshold": 0.9232435226438108,
+      "val_eer_traintime_impl": 0.010497570233193306,
+      "val_min_dcf": 0.027778101552289367,
+      "val_min_dcf_threshold": 0.9770563840866089,
+      "dcf_params": {
+        "pi_spoof": 0.05,
+        "c_miss": 1.0,
+        "c_fa": 10.0
+      },
+      "checkpoint_logged_val_eer": 0.010505970763041527,
+      "checkpoint": "checkpoints/setup_a/best_a_ep13_eer0105_0713_0401.pt",
+      "checkpoint_sha256": "5f48571c9bce368d7ec20b7e0c02abea0d241d9c4bf04ccd967bb1fcaba8da0e",
+      "codec_check_val": {
+        "opus_16": {
+          "miss": 0.02872340425531915,
+          "false_alarm": 0.03289181260556494,
+          "dcf_at_threshold": 0.08746628069067132,
+          "min_dcf": 0.08200567000754672,
+          "val_eer": 0.030718085106491565
+        },
+        "opus_32": {
+          "miss": 0.010106382978723405,
+          "false_alarm": 0.024446617477109075,
+          "dcf_at_threshold": 0.04364874513668354,
+          "min_dcf": 0.04357387914386711,
+          "val_eer": 0.017420212764550164
+        },
+        "opus_64": {
+          "miss": 0.00997340425531915,
+          "false_alarm": 0.011378789225708952,
+          "dcf_at_threshold": 0.030328257310815336,
+          "min_dcf": 0.026538258483496426,
+          "val_eer": 0.010578718108069913
+        },
+        "mp3_64": {
+          "miss": 0.015691489361702126,
+          "false_alarm": 0.01795715174682194,
+          "dcf_at_threshold": 0.04777098153405598,
+          "min_dcf": 0.04330247676862057,
+          "val_eer": 0.01706818383856313
+        },
+        "mp3_128": {
+          "miss": 0.013829787234042552,
+          "false_alarm": 0.018312738910125345,
+          "dcf_at_threshold": 0.04458933465480619,
+          "min_dcf": 0.04163218054370789,
+          "val_eer": 0.016090425533355966
+        },
+        "aac_128": {
+          "miss": 0.010638297872340425,
+          "false_alarm": 0.010845408480753846,
+          "dcf_at_threshold": 0.03105817443820065,
+          "min_dcf": 0.02818520511515927,
+          "val_eer": 0.0108454084807539
+        }
+      },
+      "git_commit": "a157fa2005b672c04cdac92ba50d235e2c641ab6",
+      "torch": "2.10.0+cu128",
+      "device": "cuda",
+      "created_utc": "2026-10-04T15:29:03+00:00",
+      "identity": {
+        "schema": 1,
+        "model": "A1",
+        "checkpoint_sha256": "5f48571c9bce368d7ec20b7e0c02abea0d241d9c4bf04ccd967bb1fcaba8da0e",
+        "pca_sha256": null,
+        "runtime": {
+          "torch": "2.11.0",
+          "torchaudio": "2.11.0",
+          "numpy": "2.3.5",
+          "scipy": "1.16.3",
+          "scikit-learn": "1.8.0",
+          "soundfile": "0.13.1"
+        },
+        "sources": {
+          "demo/inference.py": "92d078c95a95bfb9f705cc9b1a827fe9803f74ed14877a34e116e73d86b5376f",
+          "demo/decode.py": "d09c9c22d2b2f6c4035ab9acfd5e9c23a9219ac09f515e4b59de2110c31a646b",
+          "demo/artifact_identity.py": "7c3e847e80b68be235896640c4ab6a31b3bc7b6f6c267158f1c1b4aec7c26434",
+          "demo/check_parity.py": "87af62fafea01e1e64df5a317d15660d18562f4b99b8a377083ef511de5962a1",
+          "src/train.py": "afaa4489766af28159e3173250f8d00a217898bd0bfda2fd6186d9c644c80aa0",
+          "src/pipeline/augment.py": "f957e7c33cd65316f10f6ef78ff4c1023bd1530055c331dde0be4d8e241eabca",
+          "src/fusion/two_stream_net.py": "dd70e9d4f7247abf21d453910205b618af7f0cafdccaeeae7a00b07225629ae9",
+          "src/fusion/attention_fusion.py": "9b6811dfc2cdb11068b77ca20a2fe37e8f05a3b0e8c47e71fb4cb640c0a75b87",
+          "src/stream1/rawnet2.py": "377de57a55f4adab7b5dc19e00f8f828254920f55302e74a638e040250bdc772",
+          "src/stream1/sinc_conv.py": "09bcdc235bc05b8b423a63988ddda3b297720049f5cae3c3de6c3033d41e35d7"
+        }
+      },
+      "identity_binding": "Staged against current source; legacy source provenance incomplete; parity and clean-cache agreement required.",
+      "backup_content_sha256": "d9bda132d85bc50a68f0d3232833b41f4625c055cc534020e5c3cdaee2ec0a3b",
+      "clean_cache_sha256": "15fa16ecaddee74cd72edf16c8d17c30ff48673b482b64be8a5e8e583441210a"
+    }
   }
 }

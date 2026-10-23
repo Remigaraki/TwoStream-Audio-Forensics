@@ -14,7 +14,7 @@ Upload a speech recording (WAV, FLAC or MP3). The first 4 seconds are scored by
 **C1**, a two-stream (RawNet2 + LFCC/bispectrum) cross-modal attention model
 trained on ASVspoof 5. **A1** (RawNet2 only) can be run as a separate comparison.
 
-This is an experimental research model. Its output is a model score, not proof of
+This is an experimental research model. Its output is a spoof score, not proof of
 authenticity or identity. Reported error rates apply to an in-domain ASVspoof 5
 test split only; see the app's *About the research* tab.
 
